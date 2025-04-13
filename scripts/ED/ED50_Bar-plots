@@ -1,0 +1,48 @@
+#Complete for post-stress and recovery data
+
+#load in library
+library(dplyr)
+library(ggplot2)
+
+#load in dfs
+AcroB <- read.delim('./Post_Stress/AcroB_EDLLHL.txt', sep = "\t")
+AcroG <- read.delim('./Post_Stress/AcroG_EDLLHL.txt', sep = "\t")
+MontiB <- read.delim('./Post_Stress/MontiB_EDLLHL.txt', sep = "\t")
+MontiG <- read.delim('./Post_Stress/MontiG_EDLLHL.txt', sep = "\t")
+
+df_list <- list(AcroB, AcroG, MontiB, MontiG)
+#merge
+Combined_species <- Reduce(function(x,y) merge(x, y, all=TRUE), df_list)
+#make condition a factor and make LL come before HL
+Combined_species$Condition <- factor(Combined_species$Condition, levels = c("LL", "HL"))
+
+#to plot means and SD
+df_summary <- Combined_species %>% 
+  group_by(Species, Condition) %>% 
+  summarize(
+    mean_ED50 = mean(ED50, na.rm = TRUE),
+    sd_ED50 = sd(ED50, na.rm = TRUE),
+    n = n()
+  ) %>% 
+  mutate(se_ED50 = sd_ED50 / sqrt(n)) # standard error 
+
+#make the graph 
+p = ggplot(df_summary, aes(Species, mean_ED50, fill = Condition)) +
+  geom_bar(stat = "identity",
+           position = position_dodge(width = 0.9),
+           color = "black") +
+  geom_errorbar(aes(ymin = mean_ED50 - se_ED50, ymax = mean_ED50 + se_ED50),
+                position = position_dodge(width = 0.8),
+                width = 0.2) +
+  coord_cartesian(ylim = c(33, 40)) +
+  scale_fill_grey(start = 0.65, end = 0.9) +
+  labs(
+    title = "ED50 (Post_Stress)",
+    x = "Species",
+    y = "Mean ED50"
+  ) +
+  theme_classic()
+print(p)
+
+plot_file <- file.path("./Post_Stress/", "ED50_BarChart_Post.pdf")
+ggsave(plot_file, plot = p, width = 12, height = 8, dpi = 300)
