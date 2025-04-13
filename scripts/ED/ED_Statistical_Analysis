@@ -1,3 +1,5 @@
+#Script for post-stress data, complete for recovery data too
+
 #Testing for normality, unequal variance, and pairwise t-test. 
 #Separately for each species between the two treatment groups HL & LL 
 
@@ -199,3 +201,33 @@ leveneTest(ED95 ~ Condition, data = MontiG)
 t.test(ED5 ~ Condition, data = MontiG, var.equal = TRUE)
 #complete t-test ED95
 t.test(ED95 ~ Condition, data = MontiG, var.equal = TRUE)
+
+
+###Now test for changes in ranking between conditions and between post-stress/recovery data #############################
+#load in data
+EDS <- read.delim('./EDs_SpeciesSpearmansRank.txt', sep = "\t")
+
+#first separate data > HL
+HL <- subset(EDS, Condition == "HL")
+
+#first separate data > LL
+LL <- subset(EDS, Condition == "LL")
+
+#Test HL correlation
+cor.test(HL$Post_Rank, HL$Recovery_Rank, method = "spearman")
+#Test LL correlation
+cor.test(LL$Post_Rank, LL$Recovery_Rank, method = "spearman")
+
+#difference in ranking between conditions ###########################
+#load in data
+EDspecies <- read.delim('./EDspecies_SpearmansRank.txt', sep = "\t")
+
+#between  post-stress
+cor.test(EDspecies$HL_Rank_Post, EDspecies$LL_Rank_Post, method = "spearman")
+
+#between  recovery
+cor.test(EDspecies$HL_Rank_Recovery, EDspecies$LL_Rank_Recovery, method = "spearman")
+
+
+
+
