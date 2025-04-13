@@ -1,0 +1,816 @@
+#First load packages
+library(ggplot2)
+library(dplyr)
+
+#Intially files were averaged using code below (code displays LL but same was completed for HL)
+
+############Pre stress FLuores LL ################################################
+
+# Base directory path
+#base_dir <- "./20240911PreSpectro/Fluores"
+
+# Output directory for the averaged files
+#output_dir <- file.path(base_dir, "Averaged_Files")
+
+# Create the output directory if it doesn't exist
+#if (!dir.exists(output_dir)) {
+#  dir.create(output_dir)
+#}
+
+# Define the species and temperatures
+#species_list <- c("AcroB", "AcroG", "MontiB", "MontiG")
+#temperature_list <- c(28, 34, 37, 40)
+#replicate_list <- c("R1", "R2", "R3")
+
+# Extract the averaged CSV file from each replicate folder
+#get_averaged_data <- function(temp, species, replicate) {
+  # Construct the folder name based on temperature, species, and replicate
+#  folder_name <- paste0("Fluores_LL_", temp, "_", species, "_", replicate)
+#  folder_path <- file.path(base_dir, folder_name, "Average")  # Add 'Average' subfolder here
+  
+  # Check if the 'Average' subfolder exists
+#  if (!dir.exists(folder_path)) {
+#    stop(paste("Folder not found:", folder_path))
+#  }
+  
+  # List the files in the 'Average' folder and print them for debugging
+#  csv_file <- list.files(folder_path, pattern = "_averaged_with_se.csv", full.names = TRUE)
+#  cat("Files in", folder_path, ":", csv_file, "\n")  # Print available files for debugging
+  
+  # Check if the file exists and return it
+#  if (length(csv_file) > 0) {
+#    return(read.csv(csv_file[1]))  # Read the first match (if multiple files, you can adjust this)
+#  } else {
+#    stop(paste("Averaged file not found in:", folder_path))
+#  }
+#}
+
+# Function to average the replicate data for each temperature/species combination
+#average_replicates <- function(temp, species) {
+  # Read the replicate data
+#  replicate_data <- lapply(replicate_list, function(replicate) {
+#    get_averaged_data(temp, species, replicate)
+#  })
+  
+  # Assuming all replicate data have the same structure, calculate the average
+#  averaged_data <- Reduce("+", replicate_data) / length(replicate_data)
+  
+  # Return the averaged data
+#  return(averaged_data)
+#}
+
+# Loop through each species and temperature combination
+#for (species in species_list) {
+#  for (temp in temperature_list) {
+    
+    # Average the data for the current temperature and species
+#    averaged_data <- average_replicates(temp, species)
+    
+    # Output filename without the replicate part
+#    output_filename <- paste0("Fluores_LL_", temp, "_", species, ".csv")
+    
+    # Save the averaged data in the new output folder
+#    write.csv(averaged_data, file = file.path(output_dir, output_filename), row.names = FALSE)
+    
+#    # Print a message to confirm the file has been saved
+#    cat("Averaged file saved:", file.path(output_dir, output_filename), "\n")
+#  }
+#}
+
+#Now Post
+############Post stress FLuores LL ################################################
+
+# Base directory path
+#base_dir <- "./20240912PostSpectro/fluores"
+
+# Output directory for the averaged files
+#output_dir <- file.path(base_dir, "Averaged_Files")
+
+## Create the output directory if it doesn't exist
+#if (!dir.exists(output_dir)) {
+#  dir.create(output_dir)
+#}
+
+# Define the species and temperatures
+#species_list <- c("AcroB", "AcroG", "MontiB", "MontiG")
+#temperature_list <- c(28, 34, 37, 40)
+#replicate_list <- c("R1", "R2", "R3")
+
+# Extract the averaged CSV file from each replicate folder
+#get_averaged_data <- function(temp, species, replicate) {
+#  # Construct the folder name based on temperature, species, and replicate
+#  folder_name <- paste0("Fluores_LL_", temp, "_", species, "_", replicate)
+#  folder_path <- file.path(base_dir, folder_name, "Average")  # Add 'Average' subfolder here
+  
+#  # Check if the 'Average' subfolder exists
+#  if (!dir.exists(folder_path)) {
+#    stop(paste("Folder not found:", folder_path))
+#  }
+  
+#  # List the files in the 'Average' folder and print them for debugging
+#  csv_file <- list.files(folder_path, pattern = "_averaged_with_se.csv", full.names = TRUE)
+#  cat("Files in", folder_path, ":", csv_file, "\n")  # Print available files for debugging
+  
+#  # Check if the file exists and return it
+#  if (length(csv_file) > 0) {
+#    return(read.csv(csv_file[1]))  # Read the first match (if multiple files, you can adjust this)
+#  } else {
+#    stop(paste("Averaged file not found in:", folder_path))
+#  }
+#}
+
+# Function to average the replicate data for each temperature/species combination
+#average_replicates <- function(temp, species) {
+#  # Read the replicate data
+#  replicate_data <- lapply(replicate_list, function(replicate) {
+#    get_averaged_data(temp, species, replicate)
+#  })
+  
+#  # Assuming all replicate data have the same structure, calculate the average
+#  averaged_data <- Reduce("+", replicate_data) / length(replicate_data)
+  
+#  # Return the averaged data
+#  return(averaged_data)
+#}
+
+# Loop through each species and temperature combination
+#for (species in species_list) {
+#  for (temp in temperature_list) {
+    
+#    # Average the data for the current temperature and species
+#    averaged_data <- average_replicates(temp, species)
+    
+#    # Output filename without the replicate part
+#   output_filename <- paste0("Fluores_LL_", temp, "_", species, ".csv")
+    
+#    # Save the averaged data in the new output folder
+#    write.csv(averaged_data, file = file.path(output_dir, output_filename), row.names = FALSE)
+    
+#    # Print a message to confirm the file has been saved
+#    cat("Averaged file saved:", file.path(output_dir, output_filename), "\n")
+#  }
+#}
+
+##Now graphs can be completed for LL
+
+#28C############################################
+
+# Paths for specific temperature (28°C in this example)
+inputfiles_pre <- Sys.glob('./20240911PreSpectro/Fluores/Averaged_Files/*28*csv')  # Pre-stress files
+inputfiles_post <- Sys.glob('./20240912PostSpectro/fluores/Averaged_Files/*28*csv')  # Post-stress files
+
+# Create an empty list to store data from all files (post and pre stress)
+all_data <- list()
+
+# Function to extract species from the filename (just species, not the entire name)
+extract_info <- function(filepath) {
+  base <- basename(filepath)
+  
+  # Extract species (e.g., AcroB, AcroG, MontiB, MontiG)
+  species <- sub(".*_(Acro[BG]|Monti[BG])\\.csv", "\\1", base)
+  
+  return(species)  # Return the extracted species name
+}
+
+
+### Load and process pre-stress files for 28°C
+for (i in inputfiles_pre) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input1 <- read.csv(i, sep = ",", col.names = c("wavelength", "mean_emission", "se_emission", "Species", "Temp"))
+  input1$species <- species  # Add species info (just species name)
+  input1$temperature <- 28  # Manually set temperature to 28°C
+  input1$condition <- "Pre-Stress"  # Mark as pre-stress
+  all_data[[i]] <- input1
+}
+
+### Load and process post-stress files for 28°C
+for (i in inputfiles_post) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input1 <- read.csv(i, sep = ",", col.names = c("wavelength", "mean_emission", "se_emission", "Species", "Temp"))
+  input1$species <- species  # Add species info (just species name)
+  input1$temperature <- 28  # Manually set temperature to 28°C
+  input1$condition <- "Post-Stress"  # Mark as post-stress
+  all_data[[i]] <- input1
+}
+
+# Combine all the data into a single data frame
+combined_data <- do.call(rbind, all_data)
+
+# Fixed x and y axis limits
+x_limit_fixed <- c(390, 700)  # Set x-axis limits from 0 to 800 nm
+y_limit_fixed <- c(0, 6000)  # Set y-axis limits from 0 to 4000
+
+# Set the factor levels for the 'condition' column to make "Pre-Stress" come before "Post-Stress"
+combined_data$condition <- factor(combined_data$condition, levels = c("Pre-Stress", "Post-Stress"))
+
+
+# Plotting the combined data with overlaid graphs for different species and conditions
+overlay_plot <- ggplot(combined_data, aes(x = wavelength, y = mean_emission, color = species, group = interaction(condition, species))) +
+  geom_line(aes(linetype = condition, size = condition), show.legend = TRUE) +  # Add size aesthetic and ensure it's displayed in the legend
+  geom_ribbon(aes(ymin = mean_emission - se_emission, ymax = mean_emission + se_emission, fill = species), alpha = 0.4) +  # Fill by species for matching ribbon color
+  labs(
+    x = "Wavelength (nm)",
+    y = "Emission intensity",
+    title = "Pre- and Post-Stress LL for 28°C"
+  ) +
+  scale_color_manual(name = "species", values = c("AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966", "MontiG" = "#00ff00")) +  # Set custom colors for species
+  scale_fill_manual(name = "species", values = c("AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966", "MontiG" = "#00ff00")) +  # Fill matching species
+  scale_linetype_manual(name = "Condition", values = c("Pre-Stress" = "dotted", "Post-Stress" = "solid")) +  # Different linetypes for conditions
+  scale_size_manual(name = "Condition", values = c("Pre-Stress" = 2.5, "Post-Stress" = 1.5)) +  # Different widths for conditions
+  scale_x_continuous(limits = x_limit_fixed) +  # Set fixed x-axis limits
+  scale_y_continuous(limits = y_limit_fixed) +  # Set fixed y-axis limits
+  theme_classic()
+
+print(overlay_plot)
+
+# Generate the output plot file name
+plot_file <- file.path("./FluoresPrePost_ScaledLL/", "PrePost_Overlay_plot_28C_LL_Average.pdf")
+
+# Save the plot as a PDF file
+ggsave(plot_file, plot = overlay_plot, width = 8, height = 6, dpi = 300)
+
+# Display the plot in RStudio or similar environment
+print(overlay_plot)
+
+
+##################### 34C ###################################################################################################################################
+
+# Paths for specific temperature (34°C in this example)
+inputfiles_pre <- Sys.glob('./20240911PreSpectro/Fluores/Averaged_Files/*34*csv')  # Pre-stress files
+inputfiles_post <- Sys.glob('./20240912PostSpectro/fluores/Averaged_Files/*34*csv')  # Post-stress files
+
+# Create an empty list to store data from all files (post and pre stress)
+all_data <- list()
+
+# Function to extract species from the filename (just species, not the entire name)
+extract_info <- function(filepath) {
+  base <- basename(filepath)
+  
+  # Extract species (e.g., AcroB, AcroG, MontiB, MontiG)
+  species <- sub(".*_(Acro[BG]|Monti[BG])\\.csv", "\\1", base)
+  
+  return(species)  # Return the extracted species name
+}
+
+
+### Load and process pre-stress files for 34°C
+for (i in inputfiles_pre) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input1 <- read.csv(i, sep = ",", col.names = c("wavelength", "mean_emission", "se_emission", "Species", "Temp"))
+  input1$species <- species  # Add species info (just species name)
+  input1$temperature <- 34  # Manually set temperature to 34°C
+  input1$condition <- "Pre-Stress"  # Mark as pre-stress
+  all_data[[i]] <- input1
+}
+
+### Load and process post-stress files for 34°C
+for (i in inputfiles_post) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input1 <- read.csv(i, sep = ",", col.names = c("wavelength", "mean_emission", "se_emission", "Species", "Temp"))
+  input1$species <- species  # Add species info (just species name)
+  input1$temperature <- 34  # Manually set temperature to 34°C
+  input1$condition <- "Post-Stress"  # Mark as post-stress
+  all_data[[i]] <- input1
+}
+
+# Combine all the data into a single data frame
+combined_data <- do.call(rbind, all_data)
+
+# Fixed x and y axis limits
+x_limit_fixed <- c(390, 700)  # Set x-axis limits from 0 to 800 nm
+y_limit_fixed <- c(0, 6000)  # Set y-axis limits from 0 to 4000
+
+# Set the factor levels for the 'condition' column to make "Pre-Stress" come before "Post-Stress"
+combined_data$condition <- factor(combined_data$condition, levels = c("Pre-Stress", "Post-Stress"))
+
+
+# Plotting the combined data with overlaid graphs for different species and conditions
+overlay_plot <- ggplot(combined_data, aes(x = wavelength, y = mean_emission, color = species, group = interaction(condition, species))) +
+  geom_line(aes(linetype = condition, size = condition), show.legend = TRUE) +  # Add size aesthetic and ensure it's displayed in the legend
+  geom_ribbon(aes(ymin = mean_emission - se_emission, ymax = mean_emission + se_emission, fill = species), alpha = 0.4) +  # Fill by species for matching ribbon color
+  labs(
+    x = "Wavelength (nm)",
+    y = "Emission intensity",
+    title = "Pre- and Post-Stress LL for 34°C"
+  ) +
+  scale_color_manual(name = "species", values = c("AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966", "MontiG" = "#00ff00")) +  # Set custom colors for species
+  scale_fill_manual(name = "species", values = c("AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966", "MontiG" = "#00ff00")) +  # Fill matching species
+  scale_linetype_manual(name = "Condition", values = c("Pre-Stress" = "dotted", "Post-Stress" = "solid")) +  # Different linetypes for conditions
+  scale_size_manual(name = "Condition", values = c("Pre-Stress" = 2.5, "Post-Stress" = 1.5)) +  # Different widths for conditions
+  scale_x_continuous(limits = x_limit_fixed) +  # Set fixed x-axis limits
+  scale_y_continuous(limits = y_limit_fixed) +  # Set fixed y-axis limits
+  theme_classic()
+
+
+print(overlay_plot)
+
+# Generate the output plot file name
+plot_file <- file.path("./FluoresPrePost_ScaledLL/", "PrePost_Overlay_plot_34C_LL_Average.pdf")
+
+# Save the plot as a PDF file
+ggsave(plot_file, plot = overlay_plot, width = 8, height = 6, dpi = 300)
+
+
+
+############################################# 37C ############################################
+
+
+# Paths for specific temperature (37°C in this example)
+inputfiles_pre <- Sys.glob('./20240911PreSpectro/Fluores/Averaged_Files/*37*csv')  # Pre-stress files
+inputfiles_post <- Sys.glob('./20240912PostSpectro/fluores/Averaged_Files/*37*csv')  # Post-stress files
+
+# Create an empty list to store data from all files (post and pre stress)
+all_data <- list()
+
+# Function to extract species from the filename (just species, not the entire name)
+extract_info <- function(filepath) {
+  base <- basename(filepath)
+  
+  # Extract species (e.g., AcroB, AcroG, MontiB, MontiG)
+  species <- sub(".*_(Acro[BG]|Monti[BG])\\.csv", "\\1", base)
+  
+  return(species)  # Return the extracted species name
+}
+
+
+### Load and process pre-stress files for 37°C
+for (i in inputfiles_pre) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input1 <- read.csv(i, sep = ",", col.names = c("wavelength", "mean_emission", "se_emission", "Species", "Temp"))
+  input1$species <- species  # Add species info (just species name)
+  input1$temperature <- 37  # Manually set temperature to 37°C
+  input1$condition <- "Pre-Stress"  # Mark as pre-stress
+  all_data[[i]] <- input1
+}
+
+### Load and process post-stress files for 37°C
+for (i in inputfiles_post) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input1 <- read.csv(i, sep = ",", col.names = c("wavelength", "mean_emission", "se_emission", "Species", "Temp"))
+  input1$species <- species  # Add species info (just species name)
+  input1$temperature <- 37  # Manually set temperature to 37°C
+  input1$condition <- "Post-Stress"  # Mark as post-stress
+  all_data[[i]] <- input1
+}
+
+# Combine all the data into a single data frame
+combined_data <- do.call(rbind, all_data)
+
+# Fixed x and y axis limits
+x_limit_fixed <- c(390, 700)  # Set x-axis limits from 0 to 800 nm
+y_limit_fixed <- c(0, 6000)  # Set y-axis limits from 0 to 4000
+
+# Set the factor levels for the 'condition' column to make "Pre-Stress" come before "Post-Stress"
+combined_data$condition <- factor(combined_data$condition, levels = c("Pre-Stress", "Post-Stress"))
+
+
+# Plotting the combined data with overlaid graphs for different species and conditions
+overlay_plot <- ggplot(combined_data, aes(x = wavelength, y = mean_emission, color = species, group = interaction(condition, species))) +
+  geom_line(aes(linetype = condition, size = condition), show.legend = TRUE) +  # Add size aesthetic and ensure it's displayed in the legend
+  geom_ribbon(aes(ymin = mean_emission - se_emission, ymax = mean_emission + se_emission, fill = species), alpha = 0.4) +  # Fill by species for matching ribbon color
+  labs(
+    x = "Wavelength (nm)",
+    y = "Emission intensity",
+    title = "Pre- and Post-Stress LL for 37°C"
+  ) +
+  scale_color_manual(name = "species", values = c("AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966", "MontiG" = "#00ff00")) +  # Set custom colors for species
+  scale_fill_manual(name = "species", values = c("AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966", "MontiG" = "#00ff00")) +  # Fill matching species
+  scale_linetype_manual(name = "Condition", values = c("Pre-Stress" = "dotted", "Post-Stress" = "solid")) +  # Different linetypes for conditions
+  scale_size_manual(name = "Condition", values = c("Pre-Stress" = 2.5, "Post-Stress" = 1.5)) +  # Different widths for conditions
+  scale_x_continuous(limits = x_limit_fixed) +  # Set fixed x-axis limits
+  scale_y_continuous(limits = y_limit_fixed) +  # Set fixed y-axis limits
+  theme_classic()
+
+# print
+print(overlay_plot)
+# Generate the output plot file name
+plot_file <- file.path("./FluoresPrePost_ScaledLL/", "PrePost_Overlay_plot_37C_LL_Average.pdf")
+
+# Save the plot as a PDF file
+ggsave(plot_file, plot = overlay_plot, width = 8, height = 6, dpi = 300)
+
+
+##################### 40C ##########################################################
+
+
+# Paths for specific temperature (40°C in this example)
+inputfiles_pre <- Sys.glob('./20240911PreSpectro/Fluores/Averaged_Files/*40*csv')  # Pre-stress files
+inputfiles_post <- Sys.glob('./20240912PostSpectro/fluores/Averaged_Files/*40*csv')  # Post-stress files
+
+# Create an empty list to store data from all files (post and pre stress)
+all_data <- list()
+
+# Function to extract species from the filename (just species, not the entire name)
+extract_info <- function(filepath) {
+  base <- basename(filepath)
+  
+  # Extract species (e.g., AcroB, AcroG, MontiB, MontiG)
+  species <- sub(".*_(Acro[BG]|Monti[BG])\\.csv", "\\1", base)
+  
+  return(species)  # Return the extracted species name
+}
+
+
+### Load and process pre-stress files for 40°C
+for (i in inputfiles_pre) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input1 <- read.csv(i, sep = ",", col.names = c("wavelength", "mean_emission", "se_emission", "Species", "Temp"))
+  input1$species <- species  # Add species info (just species name)
+  input1$temperature <- 40  # Manually set temperature to 40°C
+  input1$condition <- "Pre-Stress"  # Mark as pre-stress
+  all_data[[i]] <- input1
+}
+
+### Load and process post-stress files for 40°C
+for (i in inputfiles_post) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input1 <- read.csv(i, sep = ",", col.names = c("wavelength", "mean_emission", "se_emission", "Species", "Temp"))
+  input1$species <- species  # Add species info (just species name)
+  input1$temperature <- 40  # Manually set temperature to 40°C
+  input1$condition <- "Post-Stress"  # Mark as post-stress
+  all_data[[i]] <- input1
+}
+
+# Combine all the data into a single data frame
+combined_data <- do.call(rbind, all_data)
+
+# Fixed x and y axis limits
+x_limit_fixed <- c(390, 700)  # Set x-axis limits from 0 to 800 nm
+y_limit_fixed <- c(0, 6000)  # Set y-axis limits from 0 to 4000
+
+# Set the factor levels for the 'condition' column to make "Pre-Stress" come before "Post-Stress"
+combined_data$condition <- factor(combined_data$condition, levels = c("Pre-Stress", "Post-Stress"))
+
+
+# Plotting the combined data with overlaid graphs for different species and conditions
+overlay_plot <- ggplot(combined_data, aes(x = wavelength, y = mean_emission, color = species, group = interaction(condition, species))) +
+  geom_line(aes(linetype = condition, size = condition), show.legend = TRUE) +  # Add size aesthetic and ensure it's displayed in the legend
+  geom_ribbon(aes(ymin = mean_emission - se_emission, ymax = mean_emission + se_emission, fill = species), alpha = 0.4) +  # Fill by species for matching ribbon color
+  labs(
+    x = "Wavelength (nm)",
+    y = "Emission intensity",
+    title = "Pre- and Post-Stress LL for 40°C"
+  ) +
+  scale_color_manual(name = "species", values = c("AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966", "MontiG" = "#00ff00")) +  # Set custom colors for species
+  scale_fill_manual(name = "species", values = c("AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966", "MontiG" = "#00ff00")) +  # Fill matching species
+  scale_linetype_manual(name = "Condition", values = c("Pre-Stress" = "dotted", "Post-Stress" = "solid")) +  # Different linetypes for conditions
+  scale_size_manual(name = "Condition", values = c("Pre-Stress" = 2.5, "Post-Stress" = 1.5)) +  # Different widths for conditions
+  scale_x_continuous(limits = x_limit_fixed) +  # Set fixed x-axis limits
+  scale_y_continuous(limits = y_limit_fixed) +  # Set fixed y-axis limits
+  theme_classic()
+
+# print
+print(overlay_plot)
+
+# Generate the output plot file name
+plot_file <- file.path("./FluoresPrePost_ScaledLL/", "PrePost_Overlay_plot_40C_LL_Average.pdf")
+
+# Save the plot as a PDF file
+ggsave(plot_file, plot = overlay_plot, width = 8, height = 6, dpi = 300)
+
+############ HL##################################################################################
+#28C############################################
+
+# Paths for specific temperature (28°C in this example)
+inputfiles_pre <- Sys.glob('./20240917PreSpectro/fluores/Averaged_Files/*28*csv')  # Pre-stress files
+inputfiles_post <- Sys.glob('./20240918PostSpectro/fluores/Averaged_Files/*28*csv')  # Post-stress files
+
+# Create an empty list to store data from all files (post and pre stress)
+all_data <- list()
+
+# Function to extract species from the filename (just species, not the entire name)
+extract_info <- function(filepath) {
+  base <- basename(filepath)
+  
+  # Extract species (e.g., AcroB, AcroG, MontiB, MontiG)
+  species <- sub(".*_(Acro[BG]|Monti[BG])\\.csv", "\\1", base)
+  
+  return(species)  # Return the extracted species name
+}
+
+
+### Load and process pre-stress files for 28°C
+for (i in inputfiles_pre) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input1 <- read.csv(i, sep = ",", col.names = c("wavelength", "mean_emission", "se_emission", "Species", "Temp"))
+  input1$species <- species  # Add species info (just species name)
+  input1$temperature <- 28  # Manually set temperature to 28°C
+  input1$condition <- "Pre-Stress"  # Mark as pre-stress
+  all_data[[i]] <- input1
+}
+
+### Load and process post-stress files for 28°C
+for (i in inputfiles_post) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input1 <- read.csv(i, sep = ",", col.names = c("wavelength", "mean_emission", "se_emission", "Species", "Temp"))
+  input1$species <- species  # Add species info (just species name)
+  input1$temperature <- 28  # Manually set temperature to 28°C
+  input1$condition <- "Post-Stress"  # Mark as post-stress
+  all_data[[i]] <- input1
+}
+
+# Combine all the data into a single data frame
+combined_data <- do.call(rbind, all_data)
+
+# Fixed x and y axis limits
+x_limit_fixed <- c(390, 700)  # Set x-axis limits from 0 to 800 nm
+y_limit_fixed <- c(0, 6000)  # Set y-axis limits from 0 to 4000
+
+# Set the factor levels for the 'condition' column to make "Pre-Stress" come before "Post-Stress"
+combined_data$condition <- factor(combined_data$condition, levels = c("Pre-Stress", "Post-Stress"))
+
+
+# Plotting the combined data with overlaid graphs for different species and conditions
+overlay_plot <- ggplot(combined_data, aes(x = wavelength, y = mean_emission, color = species, group = interaction(condition, species))) +
+  geom_line(aes(linetype = condition, size = condition), show.legend = TRUE) +  # Add size aesthetic and ensure it's displayed in the legend
+  geom_ribbon(aes(ymin = mean_emission - se_emission, ymax = mean_emission + se_emission, fill = species), alpha = 0.4) +  # Fill by species for matching ribbon color
+  labs(
+    x = "Wavelength (nm)",
+    y = "Emission intensity",
+    title = "Pre- and Post-Stress HL for 28°C"
+  ) +
+  scale_color_manual(name = "species", values = c("AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966", "MontiG" = "#00ff00")) +  # Set custom colors for species
+  scale_fill_manual(name = "species", values = c("AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966", "MontiG" = "#00ff00")) +  # Fill matching species
+  scale_linetype_manual(name = "Condition", values = c("Pre-Stress" = "dotted", "Post-Stress" = "solid")) +  # Different linetypes for conditions
+  scale_size_manual(name = "Condition", values = c("Pre-Stress" = 2.5, "Post-Stress" = 1.5)) +  # Different widths for conditions
+  scale_x_continuous(limits = x_limit_fixed) +  # Set fixed x-axis limits
+  scale_y_continuous(limits = y_limit_fixed) +  # Set fixed y-axis limits
+  theme_classic()
+
+# Generate the output plot file name
+plot_file <- file.path("./PrePost_ScaledHL/", "PrePost_Overlay_plot_28C_HL_Average.pdf")
+
+# Save the plot as a PDF file
+ggsave(plot_file, plot = overlay_plot, width = 8, height = 6, dpi = 300)
+
+# print
+print(overlay_plot)
+
+
+##################### 34C ###################################################################################################################################
+
+# Paths for specific temperature (34°C in this example)
+inputfiles_pre <- Sys.glob('./20240917PreSpectro/fluores/Averaged_Files/*34*csv')  # Pre-stress files
+inputfiles_post <- Sys.glob('./20240918PostSpectro/fluores/Averaged_Files/*34*csv')  # Post-stress files
+
+# Create an empty list to store data from all files (post and pre stress)
+all_data <- list()
+
+# Function to extract species from the filename (just species, not the entire name)
+extract_info <- function(filepath) {
+  base <- basename(filepath)
+  
+  # Extract species (e.g., AcroB, AcroG, MontiB, MontiG)
+  species <- sub(".*_(Acro[BG]|Monti[BG])\\.csv", "\\1", base)
+  
+  return(species)  # Return the extracted species name
+}
+
+
+### Load and process pre-stress files for 34°C
+for (i in inputfiles_pre) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input1 <- read.csv(i, sep = ",", col.names = c("wavelength", "mean_emission", "se_emission", "Species", "Temp"))
+  input1$species <- species  # Add species info (just species name)
+  input1$temperature <- 34  # Manually set temperature to 34°C
+  input1$condition <- "Pre-Stress"  # Mark as pre-stress
+  all_data[[i]] <- input1
+}
+
+### Load and process post-stress files for 34°C
+for (i in inputfiles_post) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input1 <- read.csv(i, sep = ",", col.names = c("wavelength", "mean_emission", "se_emission", "Species", "Temp"))
+  input1$species <- species  # Add species info (just species name)
+  input1$temperature <- 34  # Manually set temperature to 34°C
+  input1$condition <- "Post-Stress"  # Mark as post-stress
+  all_data[[i]] <- input1
+}
+
+# Combine all the data into a single data frame
+combined_data <- do.call(rbind, all_data)
+
+# Fixed x and y axis limits
+x_limit_fixed <- c(390, 700)  # Set x-axis limits from 0 to 800 nm
+y_limit_fixed <- c(0, 6000)  # Set y-axis limits from 0 to 4000
+
+# Set the factor levels for the 'condition' column to make "Pre-Stress" come before "Post-Stress"
+combined_data$condition <- factor(combined_data$condition, levels = c("Pre-Stress", "Post-Stress"))
+
+
+# Plotting the combined data with overlaid graphs for different species and conditions
+overlay_plot <- ggplot(combined_data, aes(x = wavelength, y = mean_emission, color = species, group = interaction(condition, species))) +
+  geom_line(aes(linetype = condition, size = condition), show.legend = TRUE) +  # Add size aesthetic and ensure it's displayed in the legend
+  geom_ribbon(aes(ymin = mean_emission - se_emission, ymax = mean_emission + se_emission, fill = species), alpha = 0.4) +  # Fill by species for matching ribbon color
+  labs(
+    x = "Wavelength (nm)",
+    y = "Emission intensity",
+    title = "Pre- and Post-Stress HL for 34°C"
+  ) +
+  scale_color_manual(name = "species", values = c("AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966", "MontiG" = "#00ff00")) +  # Set custom colors for species
+  scale_fill_manual(name = "species", values = c("AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966", "MontiG" = "#00ff00")) +  # Fill matching species
+  scale_linetype_manual(name = "Condition", values = c("Pre-Stress" = "dotted", "Post-Stress" = "solid")) +  # Different linetypes for conditions
+  scale_size_manual(name = "Condition", values = c("Pre-Stress" = 2.5, "Post-Stress" = 1.5)) +  # Different widths for conditions
+  scale_x_continuous(limits = x_limit_fixed) +  # Set fixed x-axis limits
+  scale_y_continuous(limits = y_limit_fixed) +  # Set fixed y-axis limits
+  theme_classic()
+
+# Generate the output plot file name
+plot_file <- file.path("./PrePost_ScaledHL/", "PrePost_Overlay_plot_34C_HL_Average.pdf")
+
+# Save the plot as a PDF file
+ggsave(plot_file, plot = overlay_plot, width = 8, height = 6, dpi = 300)
+
+# print
+print(overlay_plot)
+
+############################################# 37C ############################################
+
+
+# Paths for specific temperature (37°C in this example)
+inputfiles_pre <- Sys.glob('./20240917PreSpectro/fluores/Averaged_Files/*37*csv')  # Pre-stress files
+inputfiles_post <- Sys.glob('./20240918PostSpectro/fluores/Averaged_Files/*37*csv')  # Post-stress files
+
+# Create an empty list to store data from all files (post and pre stress)
+all_data <- list()
+
+# Function to extract species from the filename (just species, not the entire name)
+extract_info <- function(filepath) {
+  base <- basename(filepath)
+  
+  # Extract species (e.g., AcroB, AcroG, MontiB, MontiG)
+  species <- sub(".*_(Acro[BG]|Monti[BG])\\.csv", "\\1", base)
+  
+  return(species)  # Return the extracted species name
+}
+
+
+### Load and process pre-stress files for 37°C
+for (i in inputfiles_pre) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input1 <- read.csv(i, sep = ",", col.names = c("wavelength", "mean_emission", "se_emission", "Species", "Temp"))
+  input1$species <- species  # Add species info (just species name)
+  input1$temperature <- 37  # Manually set temperature to 37°C
+  input1$condition <- "Pre-Stress"  # Mark as pre-stress
+  all_data[[i]] <- input1
+}
+
+### Load and process post-stress files for 37°C
+for (i in inputfiles_post) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input1 <- read.csv(i, sep = ",", col.names = c("wavelength", "mean_emission", "se_emission", "Species", "Temp"))
+  input1$species <- species  # Add species info (just species name)
+  input1$temperature <- 37  # Manually set temperature to 37°C
+  input1$condition <- "Post-Stress"  # Mark as post-stress
+  all_data[[i]] <- input1
+}
+
+# Combine all the data into a single data frame
+combined_data <- do.call(rbind, all_data)
+
+# Fixed x and y axis limits
+x_limit_fixed <- c(390, 700)  # Set x-axis limits from 0 to 800 nm
+y_limit_fixed <- c(0, 6000)  # Set y-axis limits from 0 to 4000
+
+# Set the factor levels for the 'condition' column to make "Pre-Stress" come before "Post-Stress"
+combined_data$condition <- factor(combined_data$condition, levels = c("Pre-Stress", "Post-Stress"))
+
+
+# Plotting the combined data with overlaid graphs for different species and conditions
+overlay_plot <- ggplot(combined_data, aes(x = wavelength, y = mean_emission, color = species, group = interaction(condition, species))) +
+  geom_line(aes(linetype = condition, size = condition), show.legend = TRUE) +  # Add size aesthetic and ensure it's displayed in the legend
+  geom_ribbon(aes(ymin = mean_emission - se_emission, ymax = mean_emission + se_emission, fill = species), alpha = 0.4) +  # Fill by species for matching ribbon color
+  labs(
+    x = "Wavelength (nm)",
+    y = "Emission intensity",
+    title = "Pre- and Post-Stress HL for 37°C"
+  ) +
+  scale_color_manual(name = "species", values = c("AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966", "MontiG" = "#00ff00")) +  # Set custom colors for species
+  scale_fill_manual(name = "species", values = c("AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966", "MontiG" = "#00ff00")) +  # Fill matching species
+  scale_linetype_manual(name = "Condition", values = c("Pre-Stress" = "dotted", "Post-Stress" = "solid")) +  # Different linetypes for conditions
+  scale_size_manual(name = "Condition", values = c("Pre-Stress" = 2.5, "Post-Stress" = 1.5)) +  # Different widths for conditions
+  scale_x_continuous(limits = x_limit_fixed) +  # Set fixed x-axis limits
+  scale_y_continuous(limits = y_limit_fixed) +  # Set fixed y-axis limits
+  theme_classic()
+
+# Generate the output plot file name
+plot_file <- file.path("./PrePost_ScaledHL/", "PrePost_Overlay_plot_37C_HL_Average.pdf")
+
+# Save the plot as a PDF file
+ggsave(plot_file, plot = overlay_plot, width = 8, height = 6, dpi = 300)
+
+# print
+print(overlay_plot)
+
+
+##################### 40C ##########################################################
+
+
+# Paths for specific temperature (40°C in this example)
+inputfiles_pre <- Sys.glob('./20240917PreSpectro/fluores/Averaged_Files/*40*csv')  # Pre-stress files
+inputfiles_post <- Sys.glob('./20240918PostSpectro/fluores/Averaged_Files/*40*csv')  # Post-stress files
+
+# Create an empty list to store data from all files (post and pre stress)
+all_data <- list()
+
+# Function to extract species from the filename (just species, not the entire name)
+extract_info <- function(filepath) {
+  base <- basename(filepath)
+  
+  # Extract species (e.g., AcroB, AcroG, MontiB, MontiG)
+  species <- sub(".*_(Acro[BG]|Monti[BG])\\.csv", "\\1", base)
+  
+  return(species)  # Return the extracted species name
+}
+
+
+### Load and process pre-stress files for 40°C
+for (i in inputfiles_pre) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input1 <- read.csv(i, sep = ",", col.names = c("wavelength", "mean_emission", "se_emission", "Species", "Temp"))
+  input1$species <- species  # Add species info (just species name)
+  input1$temperature <- 40  # Manually set temperature to 40°C
+  input1$condition <- "Pre-Stress"  # Mark as pre-stress
+  all_data[[i]] <- input1
+}
+
+### Load and process post-stress files for 40°C
+for (i in inputfiles_post) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input1 <- read.csv(i, sep = ",", col.names = c("wavelength", "mean_emission", "se_emission", "Species", "Temp"))
+  input1$species <- species  # Add species info (just species name)
+  input1$temperature <- 40  # Manually set temperature to 40°C
+  input1$condition <- "Post-Stress"  # Mark as post-stress
+  all_data[[i]] <- input1
+}
+
+# Combine all the data into a single data frame
+combined_data <- do.call(rbind, all_data)
+
+# Fixed x and y axis limits
+x_limit_fixed <- c(390, 700)  # Set x-axis limits from 0 to 800 nm
+y_limit_fixed <- c(0, 6000)  # Set y-axis limits from 0 to 4000
+
+# Set the factor levels for the 'condition' column to make "Pre-Stress" come before "Post-Stress"
+combined_data$condition <- factor(combined_data$condition, levels = c("Pre-Stress", "Post-Stress"))
+
+
+# Plotting the combined data with overlaid graphs for different species and conditions
+overlay_plot <- ggplot(combined_data, aes(x = wavelength, y = mean_emission, color = species, group = interaction(condition, species))) +
+  geom_line(aes(linetype = condition, size = condition), show.legend = TRUE) +  # Add size aesthetic and ensure it's displayed in the legend
+  geom_ribbon(aes(ymin = mean_emission - se_emission, ymax = mean_emission + se_emission, fill = species), alpha = 0.4) +  # Fill by species for matching ribbon color
+  labs(
+    x = "Wavelength (nm)",
+    y = "Emission intensity",
+    title = "Pre- and Post-Stress HL for 40°C"
+  ) +
+  scale_color_manual(name = "species", values = c("AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966", "MontiG" = "#00ff00")) +  # Set custom colors for species
+  scale_fill_manual(name = "species", values = c("AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966", "MontiG" = "#00ff00")) +  # Fill matching species
+  scale_linetype_manual(name = "Condition", values = c("Pre-Stress" = "dotted", "Post-Stress" = "solid")) +  # Different linetypes for conditions
+  scale_size_manual(name = "Condition", values = c("Pre-Stress" = 2.5, "Post-Stress" = 1.5)) +  # Different widths for conditions
+  scale_x_continuous(limits = x_limit_fixed) +  # Set fixed x-axis limits
+  scale_y_continuous(limits = y_limit_fixed) +  # Set fixed y-axis limits
+  theme_classic()
+
+# Generate the output plot file name
+plot_file <- file.path("./PrePost_ScaledHL/", "PrePost_Overlay_plot_40C_HL_Average.pdf")
+
+# Save the plot as a PDF file
+ggsave(plot_file, plot = overlay_plot, width = 8, height = 6, dpi = 300)
+
+#print
+print(overlay_plot)
+
+
