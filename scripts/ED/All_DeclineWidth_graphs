@@ -1,0 +1,300 @@
+#######Decline Width LOWLIGHT 
+###DARK Adapted##################
+
+###############################################################
+# Load necessary libraries
+library(ggplot2)
+
+# Your dataset
+data <- data.frame(
+  Colour_Morph = c("AcroG_R1", "AcroG_R2", "AcroG_R3", 
+                   "AcroB_R1", "AcroB_R2", "AcroB_R3", 
+                   "MontiG_R1", "MontiG_R2", "MontiG_R3", 
+                   "MontiB_R1", "MontiB_R2", "MontiB_R3"),
+  ED5 = c(33.4126092, 33.84811083, 33.74217849, 35.45984699, 35.67090305, 36.20604676, 36.53809669, 36.38076847, 36.148713, 34.95525204, 35.89352992, 35.98548947),
+  ED50 = c(36.75553486, 36.94312565, 36.94377266, 37.82105267, 37.81607235, 38.20013735, 37.95653135, 37.74278088, 37.99064923, 37.28687394, 37.22784247, 37.31489444),
+  ED95 = c(40.43291964, 40.32114346, 40.44914701, 40.33948668, 40.09024738, 40.30405483, 39.43003065, 39.15578391, 39.92644023, 39.77402214, 38.61175699, 38.69341137)
+)
+
+# Create a new column that groups replicates by colour morph
+data$Morph_Group <- gsub("_R[1-3]", "", data$Colour_Morph)
+
+# Convert Colour_Morph to a factor to preserve the order
+data$Colour_Morph <- factor(data$Colour_Morph, levels = data$Colour_Morph)
+
+# Create the dumbbell plot with grouped labels
+dumbbell_plot <- ggplot(data) +
+  geom_segment(aes(x = ED5, xend = ED95, y = Colour_Morph, yend = Colour_Morph), color = "#003333", size = 0.3, alpha = 0.8) +   # Add segments connecting ED5 to ED95 for each replicate
+  
+  # Add points for ED5, ED50, and ED95 for each replicate
+  geom_point(aes(x = ED5, y = Colour_Morph, color = "ED5"), size = 2.5, shape = 17, alpha = 0.95) +  # First point
+  geom_point(aes(x = ED50, y = Colour_Morph, color = "ED50"), size = 2.5, shape = 15, alpha = 0.95) +   # Second point
+  geom_point(aes(x = ED95, y = Colour_Morph, color = "ED95"), size = 3, shape = 18, alpha = 0.95) +
+  
+  # Set colors and remove legend title
+  scale_color_manual(values = c("ED5" = "#003333", "ED50" = "#003333", "ED95" = "#003333"), name = "") + 
+  
+  # Grouping shapes
+#  annotate("rect", xmin = 31.915, xmax = 31.67, ymin = 0.6, ymax = 3.3, fill = "#009933", alpha = 0.8) +
+#  annotate("text", x = 31.78, y = 1.9, label = "AcroG", size = 3, angle = 90) +
+#  annotate("rect", xmin = 31.915, xmax = 31.67, ymin = 3.4, ymax = 6.4, fill = "#cc9966", alpha = 0.8) +
+#  annotate("text", x = 31.78, y = 4.9, label = "AcroB", size = 3, angle = 90) +
+#  annotate("rect", xmin = 31.915, xmax = 31.67, ymin = 6.5, ymax = 9.5, fill = "#00ff00", alpha = 0.8) +
+#  annotate("text", x = 31.78, y = 7.9, label = "MontiG", size = 3, angle = 90) +
+#  annotate("rect", xmin =31.915, xmax = 31.67, ymin = 9.6, ymax = 12.6, fill = "#cc6600", alpha = 0.8) +
+#  annotate("text", x = 31.78, y = 10.9, label = "MontiB", size = 3, angle = 90) +
+
+  
+  #Grouping shapes
+  annotate("rect", xmin = 29.9, xmax=29.6, ymin=0.6, ymax=3.3, fill="#009933", alpha=0.8)+
+  annotate("text", x = 29.75, y=1.9, label="AcroG", size=3, angle=90)+
+  annotate("rect", xmin = 29.9, xmax=29.6, ymin=3.4, ymax=6.4, fill="#cc9966", alpha=0.8)+
+  annotate("text", x = 29.75, y=4.9, label="AcroB", size=3, angle=90)+
+  annotate("rect", xmin = 29.9, xmax=29.6, ymin=6.5, ymax=9.5, fill="#00ff00", alpha=0.8)+
+  annotate("text", x = 29.75, y=7.9, label="MontiG", size=3, angle=90)+
+  annotate("rect", xmin = 29.9, xmax=29.6, ymin=9.6, ymax=12.6, fill="#cc6600", alpha=0.8)+
+  annotate("text", x = 29.75, y=10.9, label="MontiB", size=3, angle=90)+
+  
+  # Labels and title
+  labs(x = "Temperature", y = "Colour Morph", title = "Dark Adapted Post-Stress (Low Light)") +
+  
+  # Minimal theme for clean look
+  expand_limits(x = 32.5, y = 0) +
+  coord_cartesian(xlim = c(30, 42), expand = FALSE, clip = "off") +
+  theme_classic() +
+  
+  # Adjust theme to remove y-axis labels and title
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        plot.title = element_text(hjust = 0.5, size = 12, face = "bold")) +  # Center the title and adjust properties
+  
+  theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "inches")) +
+  theme(legend.position = c(1, 1.2),
+        legend.justification = c("right", "top"),
+        legend.box.just = "right",
+        legend.margin = margin(3, 3, 3, 3))
+
+# Print the plot
+print(dumbbell_plot)
+
+# Save the plot as a PDF
+ggsave("DA_LL_Post_DW.pdf", plot = dumbbell_plot, width = 6, height = 6, dpi = 300)
+
+#######Decline Width LOWLIGHT  RECOVERY 
+###DARK Adapted##################
+
+###############################################################
+# Load necessary libraries
+library(ggplot2)
+
+# Your dataset
+data <- data.frame(
+  Colour_Morph = c("AcroG_R1", "AcroG_R2", "AcroG_R3", 
+                   "AcroB_R1", "AcroB_R2", "AcroB_R3", 
+                   "MontiG_R1", "MontiG_R2", "MontiG_R3", 
+                   "MontiB_R1", "MontiB_R2", "MontiB_R3"),
+  ED5 = c(33.96283426, 33.54426086, 33.66914052, 34.30224228, 34.56224868, 33.86582563, 36.0396118, 32.96970318, 33.12200864, 35.30360157, 35.43616663, 34.43841864),
+  ED50 = c(36.30160621, 36.65678002, 36.15464854, 36.96573192, 36.85478897, 36.25036975, 37.82365614, 35.56289334, 35.7858335, 36.23132578, 36.0113965,35.68615357),
+  ED95 = c(38.80143226, 40.05810493, 38.82364061, 39.83603536, 39.29939521, 38.80281324, 39.69601481, 38.36004758, 38.66389545, 37.18342915, 36.595964, 36.97909507))
+
+
+# Create a new column that groups replicates by colour morph
+data$Morph_Group <- gsub("_R[1-3]", "", data$Colour_Morph)
+
+# Convert Colour_Morph to a factor to preserve the order
+data$Colour_Morph <- factor(data$Colour_Morph, levels = data$Colour_Morph)
+
+# Create the dumbbell plot with grouped labels
+dumbbell_plot <- ggplot(data) +
+  geom_segment(aes(x = ED5, xend = ED95, y = Colour_Morph, yend = Colour_Morph), color = "#003333", size = 0.3, alpha = 0.8) +   # Add segments connecting ED5 to ED95 for each replicate
+  
+  # Add points for ED5, ED50, and ED95 for each replicate
+  geom_point(aes(x = ED5, y = Colour_Morph, color = "ED5"), size = 2.5, shape = 17, alpha = 0.95) +  # First point
+  geom_point(aes(x = ED50, y = Colour_Morph, color = "ED50"), size = 2.5, shape = 15, alpha = 0.95) +   # Second point
+  geom_point(aes(x = ED95, y = Colour_Morph, color = "ED95"), size = 3, shape = 18, alpha = 0.95) +
+  
+  # Set colors and remove legend title
+  scale_color_manual(values = c("ED5" = "#003333", "ED50" = "#003333", "ED95" = "#003333"), name = "") + 
+
+  #Grouping shapes
+  annotate("rect", xmin = 29.9, xmax=29.6, ymin=0.6, ymax=3.3, fill="#009933", alpha=0.8)+
+  annotate("text", x = 29.75, y=1.9, label="AcroG", size=3, angle=90)+
+  annotate("rect", xmin = 29.9, xmax=29.6, ymin=3.4, ymax=6.4, fill="#cc9966", alpha=0.8)+
+  annotate("text", x = 29.75, y=4.9, label="AcroB", size=3, angle=90)+
+  annotate("rect", xmin = 29.9, xmax=29.6, ymin=6.5, ymax=9.5, fill="#00ff00", alpha=0.8)+
+  annotate("text", x = 29.75, y=7.9, label="MontiG", size=3, angle=90)+
+  annotate("rect", xmin = 29.9, xmax=29.6, ymin=9.6, ymax=12.6, fill="#cc6600", alpha=0.8)+
+  annotate("text", x = 29.75, y=10.9, label="MontiB", size=3, angle=90)+
+  
+  # Labels and title
+  labs(x = "Temperature", y = "Colour Morph", title = "Dark Adapted Recovery (Low Light)") +
+  
+  # Minimal theme for clean look
+  expand_limits(x = 32.5, y = 0) +
+  coord_cartesian(xlim = c(30, 42), expand = FALSE, clip = "off") +
+  theme_classic() +
+  
+  # Adjust theme to remove y-axis labels and title
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        plot.title = element_text(hjust = 0.5, size = 12, face = "bold")) +  # Center the title and adjust properties
+  
+  theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "inches")) +
+  theme(legend.position = c(1, 1.2),
+        legend.justification = c("right", "top"),
+        legend.box.just = "right", 
+        legend.margin = margin(3, 3, 3, 3))
+
+# Print the plot
+print(dumbbell_plot)
+
+# Save the plot as a PDF
+ggsave("DA_LL_Recovery_DW.pdf", plot = dumbbell_plot, width = 6, height = 6, dpi = 300)
+
+#######Decline Width HIGHLIGHT  POST 
+###DARK Adapted##################
+
+###############################################################
+# Load necessary libraries
+library(ggplot2)
+
+# Your dataset
+data <- data.frame(Colour_Morph = c("AcroG_R1", "AcroG_R2", "AcroG_R3", 
+                                    "AcroB_R1", "AcroB_R2", "AcroB_R3", 
+                                    "MontiG_R1", "MontiG_R2", "MontiG_R3", 
+                                    "MontiB_R1", "MontiB_R2", "MontiB_R3"),
+                   ED5 = c(33.69903865,31.56907507,32.40720249,30.26795054,32.82634424,32.58241125,
+                           32.68518949,32.96175697,33.66388431,31.47620059,32.24041864,32.88439147),
+                   ED50 = c(35.43879156,34.50106271,35.34682549,34.55488873,34.4183243,35.31077471,
+                            35.3924007,36.09874463,35.45807119,34.6572462,35.33510232,35.2528827),
+                   ED95 = c(37.26836129,37.70535962,38.55309857,39.44899849,36.08751067,38.26760398,
+                            38.32384169,39.5342810,37.347883,38.15977442,38.72683758,37.79196401))
+
+# Create a new column that groups replicates by colour morph
+data$Morph_Group <- gsub("_R[1-3]", "", data$Colour_Morph)
+
+# Convert Colour_Morph to a factor to preserve the order
+data$Colour_Morph <- factor(data$Colour_Morph, levels = data$Colour_Morph)
+
+# Create the dumbbell plot with grouped labels
+dumbbell_plot <- ggplot(data) +
+  geom_segment(aes(x = ED5, xend = ED95, y = Colour_Morph, yend = Colour_Morph), color = "#003333", size = 0.3, alpha = 0.8) +   # Add segments connecting ED5 to ED95 for each replicate
+  
+  # Add points for ED5, ED50, and ED95 for each replicate
+  geom_point(aes(x = ED5, y = Colour_Morph, color = "ED5"), size = 2.5, shape = 17, alpha = 0.95) +  # First point
+  geom_point(aes(x = ED50, y = Colour_Morph, color = "ED50"), size = 2.5, shape = 15, alpha = 0.95) +   # Second point
+  geom_point(aes(x = ED95, y = Colour_Morph, color = "ED95"), size = 3, shape = 18, alpha = 0.95) +
+  
+  # Set colors and remove legend title
+  scale_color_manual(values = c("ED5" = "#003333", "ED50" = "#003333", "ED95" = "#003333"), name = "") + 
+  
+  
+  #Grouping shapes
+  annotate("rect", xmin = 29.9, xmax=29.6, ymin=0.6, ymax=3.3, fill="#009933", alpha=0.8)+
+  annotate("text", x = 29.75, y=1.9, label="AcroG", size=3, angle=90)+
+  annotate("rect", xmin = 29.9, xmax=29.6, ymin=3.4, ymax=6.4, fill="#cc9966", alpha=0.8)+
+  annotate("text", x = 29.75, y=4.9, label="AcroB", size=3, angle=90)+
+  annotate("rect", xmin = 29.9, xmax=29.6, ymin=6.5, ymax=9.5, fill="#00ff00", alpha=0.8)+
+  annotate("text", x = 29.75, y=7.9, label="MontiG", size=3, angle=90)+
+  annotate("rect", xmin = 29.9, xmax=29.6, ymin=9.6, ymax=12.6, fill="#cc6600", alpha=0.8)+
+  annotate("text", x = 29.75, y=10.9, label="MontiB", size=3, angle=90)+
+  
+  # Labels and title
+  labs(x = "Temperature", y = "Colour Morph", title = "Dark Adapted Post (High Light)") +
+  
+  # Minimal theme for clean look
+  expand_limits(x = 30, y = 0) +
+  coord_cartesian(xlim = c(30, 42), expand = FALSE, clip = "off") +
+  theme_classic() +
+  
+  # Adjust theme to remove y-axis labels and title
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        plot.title = element_text(hjust = 0.5, size = 12, face = "bold")) +  # Center the title and adjust properties
+  
+  theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "inches")) +
+  theme(legend.position = c(1, 1.2),
+        legend.justification = c("right", "top"),
+        legend.box.just = "right", 
+        legend.margin = margin(3, 3, 3, 3))
+
+print(dumbbell_plot)
+# Save the plot as a PDF
+ggsave("DA_HL_Post_DW.pdf", plot = dumbbell_plot, width = 6, height = 6, dpi = 300)
+
+#######Decline Width HIGHLIGHT  RECOVERY 
+###Dark Adapted##################
+
+###############################################################
+# Load necessary libraries
+library(ggplot2)
+
+# Your dataset
+data <- data.frame(Colour_Morph = c("AcroG_R1", "AcroG_R2", "AcroG_R3", 
+                                    "AcroB_R1", "AcroB_R2", "AcroB_R3", 
+                                    "MontiG_R1", "MontiG_R2", "MontiG_R3", 
+                                    "MontiB_R1", "MontiB_R2", "MontiB_R3"),
+                   ED5 = c(33.22715201,33.40873858,33.51577206,32.50139922,32.66265619,
+                           33.49921203,32.67500413,32.79042723,33.48367391,31.89530699,34.18826478,35.49256452),
+                   ED50 = c(35.36181068,34.9499545,35.31038872,35.45132856,35.41951861,35.27806968,
+                            35.54365694,35.32649144,35.35430258,35.18797184,36.0286174,36.3482616),
+                   ED95 = c(37.63360923,36.56226997,37.20109891,38.66900277,38.40907156,37.15138729,
+                            38.6641588,38.05869892,37.32943746,38.82055007,37.96803628,37.22458884))
+
+# Create a new column that groups replicates by colour morph
+data$Morph_Group <- gsub("_R[1-3]", "", data$Colour_Morph)
+
+# Convert Colour_Morph to a factor to preserve the order
+data$Colour_Morph <- factor(data$Colour_Morph, levels = data$Colour_Morph)
+
+# Create the dumbbell plot with grouped labels
+dumbbell_plot <- ggplot(data) +
+  geom_segment(aes(x = ED5, xend = ED95, y = Colour_Morph, yend = Colour_Morph), color = "#003333", size = 0.3, alpha = 0.8) +   # Add segments connecting ED5 to ED95 for each replicate
+  
+  # Add points for ED5, ED50, and ED95 for each replicate
+  geom_point(aes(x = ED5, y = Colour_Morph, color = "ED5"), size = 2.5, shape = 17, alpha = 0.95) +  # First point
+  geom_point(aes(x = ED50, y = Colour_Morph, color = "ED50"), size = 2.5, shape = 15, alpha = 0.95) +   # Second point
+  geom_point(aes(x = ED95, y = Colour_Morph, color = "ED95"), size = 3, shape = 18, alpha = 0.95) +
+  
+  # Set colors and remove legend title
+  scale_color_manual(values = c("ED5" = "#003333", "ED50" = "#003333", "ED95" = "#003333"), name = "") + 
+  
+  
+  #Grouping shapes
+  #Grouping shapes
+  annotate("rect", xmin = 29.9, xmax=29.6, ymin=0.6, ymax=3.3, fill="#009933", alpha=0.8)+
+  annotate("text", x = 29.75, y=1.9, label="AcroG", size=3, angle=90)+
+  annotate("rect", xmin = 29.9, xmax=29.6, ymin=3.4, ymax=6.4, fill="#cc9966", alpha=0.8)+
+  annotate("text", x = 29.75, y=4.9, label="AcroB", size=3, angle=90)+
+  annotate("rect", xmin = 29.9, xmax=29.6, ymin=6.5, ymax=9.5, fill="#00ff00", alpha=0.8)+
+  annotate("text", x = 29.75, y=7.9, label="MontiG", size=3, angle=90)+
+  annotate("rect", xmin = 29.9, xmax=29.6, ymin=9.6, ymax=12.6, fill="#cc6600", alpha=0.8)+
+  annotate("text", x = 29.75, y=10.9, label="MontiB", size=3, angle=90)+
+  
+  # Labels and title
+  labs(x = "Temperature", y = "Colour Morph", title = "Dark Adapted Recovery (High Light)") +
+  
+  # Minimal theme for clean look
+  expand_limits(x = 30, y = 0) +
+  coord_cartesian(xlim = c(30, 42), expand = FALSE, clip = "off") +
+  theme_classic() +
+  
+  # Adjust theme to remove y-axis labels and title
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        plot.title = element_text(hjust = 0.5, size = 12, face = "bold")) +  # Center the title and adjust properties
+  
+  theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "inches")) +
+  theme(legend.position = c(1, 1.2),
+        legend.justification = c("right", "top"),
+        legend.box.just = "right", 
+        legend.margin = margin(3, 3, 3, 3))
+
+print(dumbbell_plot)
+
+# Save the plot as a PDF
+ggsave("DA_HL_Recovery_DW.pdf", plot = dumbbell_plot, width = 6, height = 6, dpi = 300)
+
+# Print the plot
+print(dumbbell_plot)
+
