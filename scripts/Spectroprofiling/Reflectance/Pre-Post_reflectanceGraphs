@@ -1,0 +1,210 @@
+library(ggplot2)
+library(dplyr)
+
+########### first make LL graph #########################################################
+# Paths to MontiB reflectance files for both pre and post measurements
+inputfiles_preLL <- Sys.glob('./20240911LL/20240911PreSpectro/reflectance/Averaged_Files/*MontiB*.csv')
+inputfiles_postLL <- Sys.glob('./20240911LL/20240912PostSpectro/reflectance/Averaged_Files/*MontiB*.csv')
+
+# Define the expected temperature values
+valid_temperatures <- c(28, 34, 37, 40)
+
+# Function to read and label data by species and temperature
+read_and_label_data <- function(file_list, condition_label) {
+  data_list <- list()
+  
+  for (i in file_list) {
+    base <- basename(i)
+    
+    # Read the data from each file
+    input_data <- read.csv(i, sep = ",", skip = 14, header = FALSE,
+                           col.names = c("wavelength", "reflectance", "se", "species", "temperature"),
+                           fill = TRUE)
+    
+    # Extract temperature from file name
+    temperature <- as.numeric(sub(".*_(\\d+)_.*", "\\1", base))
+    
+    # Only include files with valid temperatures
+    if (temperature %in% valid_temperatures) {
+      # Add temperature and condition
+      input_data$temperature <- temperature
+      input_data$condition <- condition_label  # Set condition (Pre-Stress or Post-Stress)
+      
+      # Append to list
+      data_list[[i]] <- input_data
+    } else {
+      cat("Skipping file with unexpected temperature:", base, "\n")
+    }
+  }
+  
+  # Combine all data
+  return(do.call(rbind, data_list))
+}
+
+# Read and label the data for pre and post measurements
+combined_data_preLL <- read_and_label_data(inputfiles_preLL, "Pre-Stress")
+combined_data_postLL <- read_and_label_data(inputfiles_postLL, "Post-Stress")
+
+# Combine pre and post data into one data frame
+combined_dataLL <- rbind(combined_data_preLL, combined_data_postLL)
+
+# Set the factor levels for the 'condition' column to make "Pre-Stress" come before "Post-Stress"
+combined_dataLL$condition <- factor(combined_dataLL$condition, levels = c("Pre-Stress", "Post-Stress"))
+
+par(mfcol = c(1,2))
+
+##With Pre-stress faded in background make LL plot ********************************************************************************
+overlay_plotLL <- ggplot() +
+  # Pre-Stress ribbon layer (drawn in the background)
+  geom_ribbon(data = dplyr::filter(combined_dataLL, condition == "Pre-Stress"),
+              aes(x = wavelength, ymin = reflectance - se, ymax = reflectance + se, 
+                  fill = as.factor(temperature)),
+              alpha = 0.2) +
+  # Post-Stress ribbon layer (also in the background)
+  geom_ribbon(data = dplyr::filter(combined_dataLL, condition == "Post-Stress"),
+              aes(x = wavelength, ymin = reflectance - se, ymax = reflectance + se, 
+                  fill = as.factor(temperature)),
+              alpha = 0.5) +
+  # Pre-Stress line layer (faded)
+  geom_line(data = dplyr::filter(combined_dataLL, condition == "Pre-Stress"),
+            aes(x = wavelength, y = reflectance, 
+                color = as.factor(temperature),
+                linetype = condition,
+                group = interaction(temperature, condition)),
+            size = 0.8, alpha = 0.3) +
+  # Post-Stress line layer (solid)
+  geom_line(data = dplyr::filter(combined_dataLL, condition == "Post-Stress"),
+            aes(x = wavelength, y = reflectance, 
+                color = as.factor(temperature),
+                linetype = condition,
+                group = interaction(temperature, condition)),
+            size = 0.8, alpha = 1) +
+  labs(x = "Wavelength (nm)", y = "% Reflectance") +
+  scale_color_manual(name = "Temperature", 
+                     values = c("28" = "dodgerblue", "34" = "gold", 
+                                "37" = "darkorange", "40" = "indianred2")) +
+  scale_fill_manual(name = "Temperature", 
+                    values = c("28" = "dodgerblue", "34" = "gold", 
+                               "37" = "darkorange", "40" = "indianred2")) +
+  scale_linetype_manual(name = "Condition", 
+                        values = c("Pre-Stress" = "dotted", "Post-Stress" = "solid")) +
+  theme_classic() +
+  theme(legend.position = c(0.8, 0.8)) +
+  xlim(440, 700) +
+  ylim(0, 20.5)
+
+print(overlay_plotLL)
+
+#####################################then make HL graph ###################################
+
+# Paths to MontiB reflectance files for both pre and post measurements
+inputfiles_preHL <- Sys.glob('./20240917HL/20240917PreSpectro/reflectance/Averaged_Files/*MontiB*.csv')
+inputfiles_postHL <- Sys.glob('./20240917HL/20240918PostSpectro/reflectance/Averaged_Files/*MontiB*.csv')
+
+# Define the expected temperature values
+valid_temperatures <- c(28, 34, 37, 40)
+
+# Function to read and label data by species and temperature
+read_and_label_data <- function(file_list, condition_label) {
+  data_list <- list()
+  
+  for (i in file_list) {
+    base <- basename(i)
+    
+    # Read the data from each file
+    input_data <- read.csv(i, sep = ",", skip = 14, col.names = c("wavelength", "reflectance", "se", "species", "temperature"))
+    
+    # Extract temperature from file name
+    temperature <- as.numeric(sub(".*_(\\d+)_.*", "\\1", base))
+    
+    # Only include files with valid temperatures
+    if (temperature %in% valid_temperatures) {
+      # Add temperature and condition
+      input_data$temperature <- temperature
+      input_data$condition <- condition_label  # Set condition (Pre-Stress or Post-Stress)
+      
+      # Append to list
+      data_list[[i]] <- input_data
+    } else {
+      cat("Skipping file with unexpected temperature:", base, "\n")
+    }
+  }
+  
+  # Combine all data
+  return(do.call(rbind, data_list))
+}
+
+
+# Read and label the data for pre and post measurements
+combined_data_preHL <- read_and_label_data(inputfiles_preHL, "Pre-Stress")
+combined_data_postHL <- read_and_label_data(inputfiles_postHL, "Post-Stress")
+
+# Combine pre and post data into one data frame
+combined_dataHL <- rbind(combined_data_preHL, combined_data_postHL)
+
+# Set the factor levels for the 'condition' column to make "Pre-Stress" come before "Post-Stress"
+combined_dataHL$condition <- factor(combined_dataHL$condition, levels = c("Pre-Stress", "Post-Stress"))
+
+overlay_plotHL <- ggplot() +
+  # Pre-Stress ribbon layer (drawn in the background)
+  geom_ribbon(data = dplyr::filter(combined_dataHL, condition == "Pre-Stress"),
+              aes(x = wavelength, ymin = reflectance - se, ymax = reflectance + se, 
+                  fill = as.factor(temperature)),
+              alpha = 0.2) +
+  # Post-Stress ribbon layer (also in the background)
+  geom_ribbon(data = dplyr::filter(combined_dataHL, condition == "Post-Stress"),
+              aes(x = wavelength, ymin = reflectance - se, ymax = reflectance + se, 
+                  fill = as.factor(temperature)),
+              alpha = 0.5) +
+  # Pre-Stress line layer (faded)
+  geom_line(data = dplyr::filter(combined_dataHL, condition == "Pre-Stress"),
+            aes(x = wavelength, y = reflectance, 
+                color = as.factor(temperature),
+                linetype = condition,
+                group = interaction(temperature, condition)),
+            size = 0.8, alpha = 0.3) +
+  # Post-Stress line layer (solid)
+  geom_line(data = dplyr::filter(combined_dataHL, condition == "Post-Stress"),
+            aes(x = wavelength, y = reflectance, 
+                color = as.factor(temperature),
+                linetype = condition,
+                group = interaction(temperature, condition)),
+            size = 0.8, alpha = 1) +
+  labs(x = "Wavelength (nm)", y = "% Reflectance") +
+  scale_color_manual(name = "Temperature", 
+                     values = c("28" = "dodgerblue", "34" = "gold", 
+                                "37" = "darkorange", "40" = "indianred2")) +
+  scale_fill_manual(name = "Temperature", 
+                    values = c("28" = "dodgerblue", "34" = "gold", 
+                               "37" = "darkorange", "40" = "indianred2")) +
+  scale_linetype_manual(name = "Condition", 
+                        values = c("Pre-Stress" = "dotted", "Post-Stress" = "solid")) +
+  theme_classic() +
+  theme(legend.position = c(0.8, 0.8)) +
+  xlim(440, 700) +
+  ylim(0, 20.5)
+
+print(overlay_plotHL)
+
+####save as a grid, one graph #######
+require(ggpubr)
+require(grid)
+overlay_plotCombined <- ggarrange(overlay_plotLL + rremove("ylab") + rremove("xlab"), 
+                                overlay_plotHL + rremove("ylab") + rremove("xlab"),
+                               # labels = c("LL", "HL"), 
+                              #  hjust = 0.1,
+                               # ncol=2, 
+                                #font.label = list(color="red", size=15),
+                                common.legend = TRUE, legend = c("top", "right"))
+overlay_plotCombined <- annotate_figure(overlay_plotCombined, left = textGrob("Reflectance (%)", rot = 90, vjust = 0.5
+                                                    , gp = gpar(cex = 1.5)),
+                bottom = textGrob("Wavelength (nm)", gp = gpar(cex = 1.5)), top = text_grob
+                ("Reflectance MontiB pre- vs post-stress", face = "bold", size = 20))
+print(overlay_plotCombined)
+
+plot_file <- file.path("./LL_HL_CombinedPlots/", "MontiB_Reflect.pdf")
+ggsave(plot_file, plot = overlay_plotCombined, width = 12, height = 6, dpi = 300)
+
+##complete for each species individually 
+
+
