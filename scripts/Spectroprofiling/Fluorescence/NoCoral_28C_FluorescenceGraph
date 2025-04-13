@@ -1,0 +1,98 @@
+# Paths for specific temperature (28°C AcroG_R3_NoC in this example)
+inputfiles_pre <- Sys.glob('./20240917HL/20240917PreSpectro/fluores/Averaged_Files/*28*.csv')  # Pre-stress files
+inputfiles_post <- Sys.glob('./20240917HL/20240918PostSpectro/fluores/Averaged_Files/*28*.csv')  # Post-stress files
+inputfiles_PostExtra <- ('./20240917HL/20240918PostSpectro/Extras/Fluores_HL_28_AcroG_R3_NoC/Average/Fluores_HL_28_AcroG_R3_NoC_averaged_with_se.csv')
+
+library (ggplot2)
+# Create an empty list to store data from all files (post, pre, and extra stress)
+all_data <- list()
+
+# Function to extract species from the filename (just species, not the entire name)
+extract_info <- function(filepath) {
+  base <- basename(filepath)
+  
+  # Extract species (e.g., AcroB, AcroG, MontiB, MontiG)
+  species <- sub(".*_(Acro[BG]|Monti[BG])\\.csv", "\\1", base)
+  
+  return(species)  # Return the extracted species name
+}
+
+### Load and process pre-stress files for 28°C
+for (i in inputfiles_pre) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input1 <- read.csv(i, sep = ",", col.names = c("wavelength", "emission", "se", "species", "temp"))
+  input1$condition <- "Pre-Stress"  # Mark as pre-stress
+  all_data[[i]] <- input1
+}
+
+### Load and process post-stress files for 28°C
+for (i in inputfiles_post) {
+  species <- extract_info(i)  # Extract species from filename
+  
+  # Read the averaged data
+  input2 <- read.csv(i, sep = ",", col.names = c("wavelength", "emission", "se", "species", "temp"))
+  input2$condition <- "Post-Stress"  # Mark as post-stress
+  all_data[[i]] <- input2
+}
+
+### Load and process the extra file (Fluores_HL_28_AcroG_R3_NoC) for 28°C
+extra_data <- read.csv(inputfiles_PostExtra, sep = ",", col.names = c("wavelength", "emission", "se"))
+extra_data$species <- "AcroG_R3_NoC"  # Label the extra file as a separate species
+extra_data$temp <- 28  # Manually set temperature to 28°C
+extra_data$condition <- "Extra"  # Mark as extra condition
+# Combine all the data into a single data frame
+combined_data <-  do.call(rbind, c(all_data, list(extra_data)))
+
+# Fixed x and y axis limits
+x_limit_fixed <- c(390, 700)  # Set x-axis limits from 0 to 800 nm
+y_limit_fixed <- c(0, 6000)  # Set y-axis limits from 0 to 4000
+
+# Set the factor levels for the 'condition' column to make "Pre-Stress", "Post-Stress", and "Extra" appear in order
+combined_data$condition <- factor(combined_data$condition, levels = c("Pre-Stress", "Post-Stress", "Extra"))
+combined_data$species <- factor(combined_data$species, levels = c("AcroB", "AcroG", "MontiB", "MontiG", "AcroG_R3_NoC"))
+
+# Plotting the combined data with overlaid graphs for different species and conditions
+overlay_plot <- ggplot(combined_data, aes(x = wavelength, y = emission, color = species, group = interaction(condition, species))) +
+  geom_line(aes(linetype = condition, size = condition), show.legend = TRUE) +  # Add size aesthetic and ensure it's displayed in the legend
+  geom_ribbon(aes(ymin = emission - se, ymax = emission + se, fill = species), alpha = 0.4) +  # Fill by species for matching ribbon color
+  labs(
+    x = "Wavelength (nm)",
+    y = "Emission intensity",
+    title = "Pre-, Post-, and Extra-Stress HL for 28°C"
+  ) +
+  scale_color_manual(name = "species", values = c( "AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966","AcroG_R3_NoC" = "#FF0000", "MontiG" = "#00ff00")) +  # Custom color for "AcroG_R3_NoC"
+  scale_fill_manual(name = "species", values = c( "AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966","AcroG_R3_NoC" = "#FF0000", "MontiG" = "#00ff00")) +  # Fill matching species and "AcroG_R3_NoC"
+  scale_linetype_manual(name = "Condition", values = c("Pre-Stress" = "dotted", "Post-Stress" = "solid", "Extra" = "solid")) +  # Different linetypes for conditions
+  scale_size_manual(name = "Condition", values = c("Pre-Stress" = 2.5, "Post-Stress" = 1.5, "Extra" = 1.2)) +  # Different widths for conditions
+  scale_x_continuous(limits = x_limit_fixed) +  # Set fixed x-axis limits
+  scale_y_continuous(limits = y_limit_fixed) +  # Set fixed y-axis limits
+  theme_classic()
+
+
+# Display the plot in RStudio or similar environment #############
+print(overlay_plot)
+
+zoom_in_plot <- ggplot(combined_data, aes(x = wavelength, y = emission, color = species, group = interaction(condition, species))) +
+  geom_line(aes(linetype = condition, size = condition), show.legend = FALSE) +  # Add size aesthetic and ensure it's displayed in the legend
+  geom_ribbon(aes(ymin = emission+2, ymax = emission-2, fill = species), alpha = 0.6, show.legend=FALSE) +
+  labs (
+    x = NULL,
+    y = NULL ) + # Fill by species for matching ribbon color
+  scale_color_manual(name = "species", values = c( "AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966","AcroG_R3_NoC" = "#FF0000", "MontiG" = "#00ff00")) +  # Custom color for "AcroG_R3_NoC"
+  scale_fill_manual(name = "species", values = c( "AcroB" = "#cc6600", "AcroG" = "#009933", "MontiB" = "#cc9966","AcroG_R3_NoC" = "#FF0000", "MontiG" = "#00ff00")) +  # Fill matching species and "AcroG_R3_NoC"
+  scale_linetype_manual(name = "Condition", values = c("Pre-Stress" = "dotted", "Post-Stress" = "solid", "Extra" = "solid")) +  # Different linetypes for conditions
+  scale_size_manual(name = "Condition", values = c("Pre-Stress" = 0.5, "Post-Stress" = 0.5, "Extra" = 0.7)) +  # Different widths for conditions
+  scale_x_continuous(limits = c(470, 490)) +  # Set fixed x-axis limits
+  scale_y_continuous(limits = c(0, 350)) +  # Set fixed y-axis limits
+  theme_classic()
+#######################################
+print(zoom_in_plot)
+
+overlay_plot + annotation_custom(ggplotGrob(zoom_in_plot), xmin=550, xmax=700, ymin=3000, ymax=6000)
+
+plot_file <- file.path("./20240917HL/20240918PostSpectro/Extras", "AcroG_R3_NoC_ReDONE.pdf")
+
+# Save the combined plot
+ggsave(plot_file, plot = overlay_plot, width = 8, height = 6, dpi = 300)
