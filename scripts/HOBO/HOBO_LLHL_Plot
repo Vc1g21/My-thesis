@@ -1,0 +1,198 @@
+#upload library
+library(ggplot2)
+
+#Load in data
+data28 <- read.csv("20240918_CBASS_HL_28C_original.csv", skip = 1, stringsAsFactors = FALSE)
+
+# Extract relevant columns (time and temperature)
+time <- data28[, 2]  # Date and Time
+temperature <- as.numeric(data28[, 3])  # Temperature in °C
+
+# Convert the time column to POSIXct format without timezone
+time <- as.POSIXct(time, format="%m/%d/%y %I:%M:%S %p")
+
+# Create a data frame for plotting
+Low <- data.frame(time, temperature)
+
+# Filter out data after September 18th, 07:00 AM
+cutoff_time <- as.POSIXct("2024-09-18 07:00:00")
+Low <- Low[Low$time <= cutoff_time, ]
+
+###34C
+
+data34 <- read.csv("20240918_CBASS_HL_34C.csv", skip = 1, stringsAsFactors = FALSE)
+
+# Extract relevant columns (time and temperature)
+time <- data34[, 2]  # Date and Time
+temperature <- as.numeric(data34[, 3])  # Temperature in °C
+
+# Convert the time column to POSIXct format without timezone
+time <- as.POSIXct(time, format="%m/%d/%y %I:%M:%S %p")
+
+# Create a data frame for plotting
+LowMid <- data.frame(time, temperature)
+
+# Filter out data after September 18th, 07:00 AM
+cutoff_time <- as.POSIXct("2024-09-18 07:00:00")
+LowMid <- LowMid[LowMid$time <= cutoff_time, ]
+
+###37C
+data37 <- read.csv("20240918_CBASS_HL_37C.csv", skip = 1, stringsAsFactors = FALSE)
+
+# Extract relevant columns (time and temperature)
+time <- data37[, 2]  # Date and Time
+temperature <- as.numeric(data37[, 3])  # Temperature in °C
+
+# Convert the time column to POSIXct format without timezone
+time <- as.POSIXct(time, format="%m/%d/%y %I:%M:%S %p")
+
+# Create a data frame for plotting
+HighMid <- data.frame(time, temperature)
+
+# Filter out data after September 18th, 07:00 AM
+cutoff_time <- as.POSIXct("2024-09-18 07:00:00")
+HighMid <- HighMid[HighMid$time <= cutoff_time, ]
+
+###40C
+data40 <- read.csv("20240918_CBASS_HL_40C.csv", skip = 1, stringsAsFactors = FALSE)
+
+# Extract relevant columns (time and temperature)
+time <- data40[, 2]  # Date and Time
+temperature <- as.numeric(data40[, 3])  # Temperature in °C
+
+# Convert the time column to POSIXct format without timezone
+time <- as.POSIXct(time, format="%m/%d/%y %I:%M:%S %p")
+
+# Create a data frame for plotting
+High <- data.frame(time, temperature)
+
+# Filter out data after September 18th, 07:00 AM
+cutoff_time <- as.POSIXct("2024-09-18 07:00:00")
+High <- High[High$time <= cutoff_time, ]
+
+##########Plot it #######################################################
+# Add temperature condition column for each dataset
+Low$Temperature_Condition <- "28C"
+LowMid$Temperature_Condition <- "34C"
+HighMid$Temperature_Condition <- "37C"
+High$Temperature_Condition <- "40C"
+
+# Combine all datasets into one
+plot_data <- rbind(Low, LowMid, HighMid, High)
+
+# Create the line plot
+ggplot(plot_data, aes(time, temperature, color = Temperature_Condition)) +
+  geom_line() +  # Create the line graph
+  labs(
+    x = "Time",  # Label for X-axis
+    y = "Temperature (°C)")+  # Label for Y-axis
+  scale_color_manual(values = c("28C" = "lightslateblue", "34C" = "gold", "37C" = "orange", "40C" = "red")) +  # Custom colors for the lines
+  theme_classic() +  # Apply a minimal theme
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(limits = c(27, 41)) +  # Adjust y-axis limits
+  scale_x_datetime(date_labels = "%H:%M", date_breaks = "1 hour")
+
+plot_file <- file.path("./", paste0("HL_HOBO.pdf")) 
+
+# Save the plot as a PDF file
+ggsave(plot_file, width = 8, height = 8, dpi = 300)
+
+##############################################################Complete for LL
+
+###28C
+data28 <- read.csv("20240911_CBASS_LL_28C.csv", skip = 1, stringsAsFactors = FALSE)
+
+# Extract relevant columns (time and temperature)
+time <- data28[, 2]  # Date and Time
+temperature <- as.numeric(data28[, 3])  # Temperature in °C
+
+# Convert the time column to POSIXct format without timezone
+time <- as.POSIXct(time, format="%m/%d/%y %I:%M:%S %p")
+
+# Create a data frame for plotting
+Low <- data.frame(time, temperature)
+
+# Filter out data after September 18th, 07:00 AM
+cutoff_time <- as.POSIXct("2024-09-12 07:00:00")
+Low <- Low[Low$time <= cutoff_time, ]
+
+
+###34C
+
+data34 <- read.csv("20240911_CBASS_LL_34C.csv", skip = 1, stringsAsFactors = FALSE)
+
+# Extract relevant columns (time and temperature)
+time <- data34[, 2]  # Date and Time
+temperature <- as.numeric(data34[, 3])  # Temperature in °C
+
+# Convert the time column to POSIXct format without timezone
+time <- as.POSIXct(time, format="%m/%d/%y %I:%M:%S %p")
+
+# Create a data frame for plotting
+LowMid <- data.frame(time, temperature)
+
+# Filter out data after September 18th, 07:00 AM
+cutoff_time <- as.POSIXct("2024-09-12 07:00:00")
+LowMid <- LowMid[LowMid$time <= cutoff_time, ]
+
+#####37C
+
+data37 <- read.csv("20240911_CBASS_LL_37C.csv", skip = 1, stringsAsFactors = FALSE)
+
+# Extract relevant columns (time and temperature)
+time <- data37[, 2]  # Date and Time
+temperature <- as.numeric(data37[, 3])  # Temperature in °C
+
+# Convert the time column to POSIXct format without timezone
+time <- as.POSIXct(time, format="%m/%d/%y %I:%M:%S %p")
+
+# Create a data frame for plotting
+HighMid <- data.frame(time, temperature)
+
+# Filter out data after September 18th, 07:00 AM
+cutoff_time <- as.POSIXct("2024-09-12 07:00:00")
+HighMid <- HighMid[HighMid$time <= cutoff_time, ]
+
+###40C
+data40 <- read.csv("20240911_CBASS_LL_40C.csv", skip = 1, stringsAsFactors = FALSE)
+
+# Extract relevant columns (time and temperature)
+time <- data40[, 2]  # Date and Time
+temperature <- as.numeric(data40[, 3])  # Temperature in °C
+
+# Convert the time column to POSIXct format without timezone
+time <- as.POSIXct(time, format="%m/%d/%y %I:%M:%S %p")
+
+# Create a data frame for plotting
+High <- data.frame(time, temperature)
+
+# Filter out data after September 18th, 07:00 AM
+cutoff_time <- as.POSIXct("2024-09-12 07:00:00")
+High <- High[High$time <= cutoff_time, ]
+
+####Plot it 
+# Add temperature condition column for each dataset
+Low$Temperature_Condition <- "28C"
+LowMid$Temperature_Condition <- "34C"
+HighMid$Temperature_Condition <- "37C"
+High$Temperature_Condition <- "40C"
+
+# Combine all datasets into one
+plot_data <- rbind(Low, LowMid, HighMid, High)
+
+# Create the line plot
+ggplot(plot_data, aes(time, temperature, color = Temperature_Condition)) +
+  geom_line() +  # Create the line graph
+  labs(
+    x = "Time",  # Label for X-axis
+    y = "Temperature (°C)")+  # Label for Y-axis
+  scale_color_manual(values = c("28C" = "lightslateblue", "34C" = "gold", "37C" = "orange", "40C" = "red")) +  # Custom colors for the lines
+  theme_classic() +  # Apply a minimal theme
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(limits = c(27, 41)) + # Adjust y-axis limits
+  scale_x_datetime(date_labels = "%H:%M", date_breaks = "1 hour")
+
+plot_file <- file.path("./", paste0("LL_HOBO.pdf")) 
+
+# Save the plot as a PDF file
+ggsave(plot_file, width = 8, height = 8, dpi = 300)
