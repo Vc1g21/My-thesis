@@ -1,0 +1,218 @@
+library(car)
+library(dplyr)
+library(ggplot2)
+
+# Read dataset 
+QM_LL <- read.delim('./QM_2734_LLPost.txt', sep = "\t")
+QM_HL <- read.delim('./QM_2734_HLPost.txt', sep = "\t")
+
+#subset LL and HL
+QM_LL$Temp <- factor(QM_LL$Temp, levels = c("28", "34", "37", "40"))
+QM_HL$Temp <- factor(QM_HL$Temp, levels = c("28", "34", "37", "40"))
+
+#check for normality
+
+shapiro_result <- shapiro.test(QM_LL$QM)
+print(shapiro_result)
+#not significant
+shapiro_result <- shapiro.test(QM_HL$QM)
+print(shapiro_result)
+#significant 
+
+#check for unequal variance
+leveneTest(QM ~ Temp, data = QM_LL)
+#not significant
+leveneTest(QM ~ Temp, data = QM_HL)
+#not significant 
+
+LL_Result <- aov(QM ~ Temp * Species, data = QM_LL)
+summary(LL_Result)
+#temp and species were significant along with their interaction
+
+#Tukey to find significant result 
+tukey_result <- TukeyHSD(LL_Result, conf.level = 0.95)
+print(tukey_result)
+
+#non-parametric anova for HL
+kruskal.test(QM ~ Temp, data = QM_HL)
+kruskal.test(QM ~ Species, data = QM_HL)
+#both nearly significant but not quite 
+
+
+######################################## Now complete t.tests for for the species between 28-34C to label significance on graphs 
+
+#subset species to do this 
+
+#LL
+AcroB_LL <- subset(QM_LL, Species == "Acro_Brown")
+AcroG_LL <- subset(QM_LL, Species == "Acro_Green")
+MontiB_LL <- subset(QM_LL, Species == "Monti_Brown")
+MontiG_LL <- subset(QM_LL, Species == "Monti_Green")
+
+#HL
+AcroB_HL <- subset(QM_HL, Species == "Acro_Brown")
+AcroG_HL <- subset(QM_HL, Species == "Acro_Green")
+MontiB_HL <- subset(QM_HL, Species == "Monti_Brown")
+MontiG_HL <- subset(QM_HL, Species == "Monti_Green")
+
+
+#check normality
+#LL
+# > AcroB shapiro-wilks
+shapiro_result <- shapiro.test(AcroB_LL$QM)
+print(shapiro_result)
+# > AcroG shapiro-wilks
+shapiro_result <- shapiro.test(AcroG_LL$QM)
+print(shapiro_result)
+#not significant 
+
+# > MontiB shapiro-wilks
+shapiro_result <- shapiro.test(MontiB_LL$QM)
+print(shapiro_result)
+# > MontiG shapiro-wilks
+shapiro_result <- shapiro.test(MontiG_LL$QM)
+print(shapiro_result)
+#not significant 
+
+#HL 
+# > AcroB shapiro-wilks
+shapiro_result <- shapiro.test(AcroB_HL$QM)
+print(shapiro_result)
+# > AcroG shapiro-wilks
+shapiro_result <- shapiro.test(AcroG_HL$QM)
+print(shapiro_result)
+#not significant 
+
+# > MontiB shapiro-wilks
+shapiro_result <- shapiro.test(MontiB_HL$QM)
+print(shapiro_result)
+# > MontiG shapiro-wilks
+shapiro_result <- shapiro.test(MontiG_HL$QM)
+print(shapiro_result)
+#not significant 
+
+
+#test for unequal variance 
+library(car)
+leveneTest(QM ~ Temp, data = AcroB_LL)
+#not significant
+leveneTest(QM ~ Temp, data = AcroB_HL)
+#not significant
+
+leveneTest(QM ~ Temp, data = AcroG_LL)
+#not significant
+leveneTest(QM ~ Temp, data = AcroG_HL)
+#not significant
+
+leveneTest(QM ~ Temp, data = MontiB_LL)
+#not significant
+leveneTest(QM ~ Temp, data = MontiB_HL)
+#not significant
+
+leveneTest(QM ~ Temp, data = MontiG_LL)
+#not significant
+leveneTest(QM ~ Temp, data = MontiG_HL)
+#not significant
+
+#LL 
+#complete t-test 
+t.test(QM ~ Temp, data = AcroB_LL, var.equal = TRUE)
+t.test(QM ~ Temp, data = AcroG_LL, var.equal = TRUE)
+#neither significant
+t.test(QM ~ Temp, data = MontiB_LL, var.equal = TRUE)
+t.test(QM ~ Temp, data = MontiG_LL, var.equal = TRUE)
+#both significant
+
+#HL 
+#complete t-test 
+t.test(QM ~ Temp, data = AcroB_HL, var.equal = TRUE)
+t.test(QM ~ Temp, data = AcroG_HL, var.equal = TRUE)
+#neither significant
+t.test(QM ~ Temp, data = MontiB_HL, var.equal = TRUE)
+t.test(QM ~ Temp, data = MontiG_HL, var.equal = TRUE)
+##neither significant
+
+
+####Now make barplots with SE error bars 
+
+#################################################QM
+QM_LL <- read.delim('./QM_2734_LLPost.txt', sep = "\t")
+
+#to plot means and SD
+QM_LL <- QM_LL %>% 
+  group_by(Species, Temp) %>% 
+  summarize(
+    mean_QM = mean(QM, na.rm = TRUE),
+    sd_QM = sd(QM, na.rm = TRUE),
+    n = n()
+  ) %>% 
+  mutate(se_QM = sd_QM / sqrt(n)) # standard error 
+
+#make temp a factor
+QM_LL$Temp <- factor(QM_LL$Temp)
+
+
+#make the graph 
+p = ggplot(QM_LL, aes(Species, mean_QM, fill = Temp)) +
+  geom_bar(stat = "identity",
+           position = position_dodge(width = 0.9),
+           color = "black") +
+  geom_errorbar(aes(ymin = mean_QM - se_QM, ymax = mean_QM + se_QM),
+                position = position_dodge(width = 0.8),
+                width = 0.2) +
+  scale_fill_brewer(name = 'Temp', palette = 'Set3')+
+  labs(
+    title = "QM (LL)",
+    x = "Species",
+    y = "Mean QM"
+  ) +
+  coord_cartesian(ylim = c(0, 0.7)) +
+  theme_classic()
+print(p)
+
+
+plot_file <- file.path("./Post_Stress/", "QM_BarChart_LLPost.pdf")
+ggsave(plot_file, plot = p, width = 12, height = 8, dpi = 300)
+
+#HL
+#################################################QM
+QM_HL <- read.delim('./QM_2734_HLPost.txt', sep = "\t")
+
+
+#to plot means and SD
+QM_HL <- QM_HL %>% 
+  group_by(Species, Temp) %>% 
+  summarize(
+    mean_QM = mean(QM, na.rm = TRUE),
+    sd_QM = sd(QM, na.rm = TRUE),
+    n = n()
+  ) %>% 
+  mutate(se_QM = sd_QM / sqrt(n)) # standard error 
+
+#make temp a factor
+QM_HL$Temp <- factor(QM_HL$Temp)
+
+
+#make the graph 
+p = ggplot(QM_HL, aes(Species, mean_QM, fill = Temp)) +
+  geom_bar(stat = "identity",
+           position = position_dodge(width = 0.9),
+           color = "black") +
+  geom_errorbar(aes(ymin = mean_QM - se_QM, ymax = mean_QM + se_QM),
+                position = position_dodge(width = 0.8),
+                width = 0.2) +
+  scale_fill_brewer(name = 'Temp', palette = 'Set3')+
+  labs(
+    title = "QM (HL)",
+    x = "Species",
+    y = "Mean QM"
+  ) +
+  coord_cartesian(ylim = c(0, 0.7)) +
+  theme_classic()
+print(p)
+
+
+plot_file <- file.path("./Post_Stress/", "QM_BarChart_HLPost.pdf")
+ggsave(plot_file, plot = p, width = 12, height = 8, dpi = 300)
+
+
