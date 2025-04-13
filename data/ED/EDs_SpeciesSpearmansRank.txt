@@ -1,0 +1,5 @@
+Species	HL_Rank_Post	LL_Rank_Post	HL_Rank_Recovery	LL_Rank_Recovery
+AcroG	2	4	2	3
+MontiB	3	3	3	4
+MontiG	1	2	1	2
+AcroB	4	1	4	1
