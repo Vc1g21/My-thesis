@@ -1,0 +1,214 @@
+# Load required packages
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(pracma)
+
+# Paths for specific temperature (34°C in this example)
+inputfiles_preLL <- Sys.glob('./20240911LL/20240911PreSpectro/Fluores/Averaged_Files/*')  # Pre-stress files
+inputfiles_postLL <- Sys.glob('./20240911LL/20240912PostSpectro/fluores/Averaged_Files/*')  # Post-stress files
+
+#label pre stress
+pre_listLL <- lapply(inputfiles_preLL, function(file) {
+  dat <- read.csv(file)
+  dat$Condition <- "Pre-Stress"  # add a column to indicate condition
+  return(dat)
+})
+
+#combine pre-stress data
+pre_dataLL <- do.call(rbind, pre_listLL)
+
+#label post stress
+post_listLL <- lapply(inputfiles_postLL, function(file) {
+  dat <- read.csv(file)
+  dat$Condition <- "Post-Stress"
+  return(dat)
+})
+
+#combine post-stress data
+post_dataLL <- do.call(rbind, post_listLL)
+
+#combine both pre and post stress
+combined_dataLL <- rbind(pre_dataLL, post_dataLL)
+
+
+# Define a function to detect peaks in a given spectrum
+detect_peaks <- function(df) {
+  # Ensure the data are sorted by wavelength
+  df <- df[order(df$wavelength), ]
+  
+  # Optionally, smooth the emission data to reduce noise.
+  # Adjust 'spar' as needed based on your data.
+  spl <- smooth.spline(df$wavelength, df$mean_emission, spar = 0.4)
+  smoothed_intensity <- predict(spl, df$wavelength)$y
+  
+  # Detect peaks using pracma's findpeaks.
+  # Adjust parameters: minpeakdistance and thresh.
+  peaks <- findpeaks(smoothed_intensity, minpeakdistance = 10, thresh = 0.2 * max(smoothed_intensity))
+  
+  # If no peaks are detected, return NA
+  if (is.null(peaks)) {
+    return(data.frame(PeakWavelength = NA, PeakIntensity = NA))
+  } else {
+    peak_indices <- peaks[, 2]  # the second column is the index of each peak
+    # Map indices back to wavelengths and intensities
+    peak_wavelengths <- df$wavelength[peak_indices]
+    peak_intensities <- smoothed_intensity[peak_indices]
+    
+    return(data.frame(PeakWavelength = peak_wavelengths, 
+                      PeakIntensity = peak_intensities))
+  }
+}
+
+# Group your combined data by Species, Condition, and Temp.
+# (Make sure Species, Condition, and Temp are correctly formatted,
+# e.g., as factors or characters.)
+grouped_data <- combined_dataLL %>%
+  group_by(Species, Condition, Temp) %>%
+  nest()   # This creates a list-column "data" with each group's spectral data
+
+# Apply the peak detection function to each group's nested data.
+grouped_data <- grouped_data %>%
+  mutate(PeakResults = map(data, detect_peaks))
+
+# Unnest the PeakResults into a flat table.
+peak_tableLL <- grouped_data %>%
+  select(-data) %>%   # optionally remove the original nested spectra
+  unnest(PeakResults)
+
+# View the resulting table
+print(peak_tableLL)
+
+###Repeat for HL
+
+
+######################################################Manual Peak detection
+
+AcroB <- subset(combined_dataLL, Species == "AcroB")
+
+# estimate range of peak detected, based on automatic method above and observation of images
+#looking for chlorophyll with highest emission
+AcroB_Peak1 <- AcroB %>% 
+  filter(abs(wavelength - 675) < 5)
+print(AcroB_Peak1)
+#isolate exact peak value for ease 
+AcroB_Peak1 <- AcroB %>% 
+  filter(wavelength == 679.931)
+print(AcroB_Peak1)
+
+#AcroG
+AcroG <- subset(combined_dataLL, Species == "AcroG")
+
+# estimate range of peak detected, based on automatic method above and observation of graphs
+#looking for peak in graphs between 500-520nm
+AcroG_Peak1 <- AcroG %>% 
+  filter(abs(wavelength - 515) < 5)
+print(AcroG_Peak1)
+#isolate exact peak value with the highest intensity
+AcroG_Peak1 <- AcroG %>% 
+  filter(wavelength == 516.180)
+print(AcroG_Peak1)
+
+#looking for chlorophyll peak in graphs between 670-700nm (experiment with wavelength value)
+AcroG_Peak2 <- AcroG %>% 
+  filter(abs(wavelength - 680) < 5)
+print(AcroG_Peak2)
+#isolate exact peak value for ease 
+AcroG_Peak2 <- AcroG %>% 
+  filter(wavelength == 679.931)
+print(AcroG_Peak2)
+
+#MontiB
+MontiB <- subset(combined_dataLL, Species == "MontiB")
+# estimate range of peak detected, based on automatic method (search species in peak_table LL) above and observation of images
+#looking for peak in graphs between 670-700nm
+MontiB_Peak1 <- MontiB %>% 
+  filter(abs(wavelength - 680) < 5)
+print(MontiB_Peak1)
+#isolate exact peak value for ease 
+MontiB_Peak1 <- MontiB %>% 
+  filter(wavelength == 679.931)
+print(MontiB_Peak1)
+
+#MontiG
+MontiG <- subset(combined_dataLL, Species == "MontiG")
+# estimate range of peak detected, based on automatic method (search species in peak_table LL) above and observation of images
+#looking for peak in graphs between 480-510nm
+MontiG_Peak1 <- MontiG %>% 
+  filter(abs(wavelength - 495) < 5)
+print(MontiG_Peak1)
+#isolate exact peak value with the highest intensity
+MontiG_Peak1 <- MontiG %>% 
+  filter(wavelength == 490.149)
+print(MontiG_Peak1)
+
+
+#looking for peak in graphs between 670-700nm
+MontiG_Peak2 <- MontiG %>% 
+  filter(abs(wavelength - 680) < 5)
+print(MontiG_Peak2)
+#isolate exact peak value for ease 
+MontiG_Peak2 <- MontiG %>% 
+  filter(wavelength == 679.931)
+print(MontiG_Peak2)
+
+
+ManualPeak_table <- rbind(MontiG_Peak1, MontiG_Peak2, MontiB_Peak1,
+                          AcroG_Peak1, AcroG_Peak2,
+                          AcroB_Peak1)
+print(ManualPeak_table)
+
+#complete for HL
+
+#############################Now complete stats on peaks
+#Overall paired t-test, pre vs post across all samples
+Fluores_Peak <- read.delim('./CombinedLLHL/SpectroprofilingSTATS_files/Manual_PeakDetection_Results.txt', sep = "\t")
+Peak_HL <- subset(Fluores_Peak, Condition == "HL")
+Peak_LL <- subset(Fluores_Peak, Condition == "LL")
+
+#Test normality
+#LL Pre
+shapiro_result <- shapiro.test(Peak_LL$Pre_mean_emission)
+print(shapiro_result)
+#significant
+#LL Post
+shapiro_result <- shapiro.test(Peak_LL$Post_mean_emission)
+print(shapiro_result)
+#significant
+
+#HL Pre
+shapiro_result <- shapiro.test(Peak_HL$Pre_mean_emission)
+print(shapiro_result)
+#significant 
+#HL Post
+shapiro_result <- shapiro.test(Peak_HL$Post_mean_emission)
+print(shapiro_result)
+#significant
+
+#Test unequal variance
+library(car)
+#LL pre
+leveneTest(Pre_mean_emission ~ Species, data = Peak_LL)
+#significant
+##LL post
+leveneTest(Post_mean_emission ~ Species, data = Peak_LL)
+#not significant
+
+#HL pre
+leveneTest(Pre_mean_emission ~ Species, data = Peak_HL)
+#significant
+#HL post
+leveneTest(Post_mean_emission ~ Species, data = Peak_HL)
+#non-significant
+#both are significant so theres unequal variance 
+
+#normality wasn't confirmed so use non-parametric alternative
+#LL
+wilcox.test(Peak_LL$Pre_mean_emission, Peak_LL$Post_mean_emission, paired = TRUE)
+#result is significant 
+
+#HL
+wilcox.test(Peak_HL$Pre_mean_emission, Peak_HL$Post_mean_emission, paired = TRUE)
+#result isn't significant 
+
+
