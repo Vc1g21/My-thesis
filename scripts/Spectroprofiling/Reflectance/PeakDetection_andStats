@@ -1,0 +1,279 @@
+#Peak detection *****************************************************************************
+# Load required packages
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(pracma)
+
+#input files LL
+
+# Paths for specific temperature (34°C in this example)
+inputfiles_preLL <- Sys.glob('./20240911LL/20240911PreSpectro/reflectance/Averaged_Files/*')  # Pre-stress files
+inputfiles_postLL <- Sys.glob('./20240911LL/20240912PostSpectro/reflectance/Averaged_Files/*')  # Post-stress files
+#make file Data the wd 
+
+
+#label pre stress
+pre_listLL <- lapply(inputfiles_preLL, function(file) {
+  dat <- read.csv(file)
+  dat$Condition <- "Pre-Stress"  # add a column to indicate condition
+  return(dat)
+})
+
+#combine pre-stress data
+pre_dataLL <- do.call(rbind, pre_listLL)
+
+#label post stress
+post_listLL <- lapply(inputfiles_postLL, function(file) {
+  dat <- read.csv(file)
+  dat$Condition <- "Post-Stress"
+  return(dat)
+})
+
+#combine post-stress data
+post_dataLL <- do.call(rbind, post_listLL)
+
+#combine both pre and post stress
+combined_dataLL <- rbind(pre_dataLL, post_dataLL)
+
+##Manual Peak detection###################################################################
+
+AcroB <- subset(combined_dataLL, Species == "AcroB")
+
+# estimate range of peak detected, based on automatic method above and observation of images
+#looking for 575 peak
+AcroB_Peak1 <- AcroB %>% 
+  filter(abs(wavelength - 580) < 10)
+print(AcroB_Peak1)
+#isolate exact peak value with the highest intensity
+AcroB_Peak1 <- AcroB %>% 
+  filter(wavelength == 581.999)
+print(AcroB_Peak1)
+
+#looking for 600 peak
+AcroB_Peak2 <- AcroB %>% 
+  filter(abs(wavelength - 605) < 10)
+print(AcroB_Peak2)
+#isolate exact peak value for ease 
+AcroB_Peak2 <- AcroB %>% 
+  filter(wavelength == 604.656)
+print(AcroB_Peak2)
+
+#looking for 650 hump
+AcroB_Peak3 <- AcroB %>% 
+  filter(abs(wavelength - 645) < 10)
+print(AcroB_Peak3)
+#isolate exact peak value for ease 
+AcroB_Peak3 <- AcroB %>% 
+  filter(wavelength ==   649.746)
+print(AcroB_Peak3)
+
+#Look for chlorophyll dip 
+AcroB_Peak4 <- AcroB %>% 
+  filter(abs(wavelength - 665) < 5)
+print(AcroB_Peak4)
+#isolate exact peak value for ease 
+AcroB_Peak4 <- AcroB %>% 
+  filter(wavelength ==   667.984)
+print(AcroB_Peak4)
+
+##AcroG
+AcroG <- subset(combined_dataLL, Species == "AcroG")
+
+# estimate range of peak detected, based on automatic method above and observation of graphs
+#looking for 516 peak
+AcroG_Peak1 <- AcroG %>% 
+  filter(abs(wavelength - 513) < 10)
+print(AcroG_Peak1)
+#isolate exact peak value with the highest intensity
+AcroG_Peak1 <- AcroG %>% 
+  filter(wavelength == 516.180)
+print(AcroG_Peak1)
+
+#looking for 575 hump
+AcroG_Peak2 <- AcroG %>% 
+  filter(abs(wavelength - 575) < 5)
+print(AcroG_Peak2)
+#isolate exact peak value for ease 
+AcroG_Peak2 <- AcroG %>% 
+  filter(wavelength == 577.443)
+print(AcroG_Peak2)
+
+#looking for 600 peak
+AcroG_Peak3 <- AcroG %>% 
+  filter(abs(wavelength - 604) < 5)
+print(AcroG_Peak3)
+#isolate exact peak value for ease 
+AcroG_Peak3 <- AcroG %>% 
+  filter(wavelength == 604.656)
+print(AcroG_Peak3)
+
+#looking for 650 hump
+AcroG_Peak4 <- AcroG %>% 
+  filter(abs(wavelength - 640) < 5)
+print(AcroG_Peak4)
+#isolate exact peak value for ease 
+AcroG_Peak4 <- AcroG %>% 
+  filter(wavelength == 649.746)
+print(AcroG_Peak4)
+
+#looking for chlorophyll dip 
+AcroG_Peak5 <- AcroG %>% 
+  filter(abs(wavelength - 667) < 5)
+print(AcroG_Peak5)
+#isolate exact peak value for ease 
+AcroG_Peak5 <- AcroG %>% 
+  filter(wavelength == 667.984)
+print(AcroG_Peak5)
+
+##MontiB
+MontiB <- subset(combined_dataLL, Species == "MontiB")
+
+# estimate range of peak detected, based on automatic method above and observation of images
+#looking for hump at 585
+MontiB_Peak1 <- MontiB %>% 
+  filter(abs(wavelength - 585) < 5)
+print(MontiB_Peak1)
+#isolate exact peak value with the highest intensity
+MontiB_Peak1 <- MontiB %>% 
+  filter(wavelength == 585.721)
+print(MontiB_Peak1)
+
+#looking for 600 peak
+MontiB_Peak2 <- MontiB %>% 
+  filter(abs(wavelength - 605) < 5)
+print(MontiB_Peak2)
+#isolate exact peak value for ease 
+MontiB_Peak2 <- MontiB %>% 
+  filter(wavelength == 607.934)
+print(MontiB_Peak2)                 
+
+#looking for 650 hump
+MontiB_Peak3 <- MontiB %>% 
+  filter(abs(wavelength - 645) < 6)
+print(MontiB_Peak3)
+#isolate exact peak value for ease 
+MontiB_Peak3 <- MontiB %>% 
+  filter(wavelength ==   649.746)
+print(MontiB_Peak3)
+
+#Looking for chlorophyll dip 
+MontiB_Peak4 <- MontiB %>% 
+  filter(abs(wavelength - 665) < 5)
+print(MontiB_Peak4)
+#isolate exact peak value for ease 
+MontiB_Peak4 <- MontiB %>% 
+  filter(wavelength ==   667.984)
+print(MontiB_Peak4)
+
+##MontiG
+MontiG <- subset(combined_dataLL, Species == "MontiG")
+
+# estimate range of peak detected, based on automatic method above and observation of graphs
+#looking for peak at 490
+MontiG_Peak1 <- MontiG %>% 
+  filter(abs(wavelength - 488) < 5)
+print(MontiG_Peak1)
+#isolate exact peak value with the highest intensity
+MontiG_Peak1 <- MontiG %>% 
+  filter(wavelength == 484.998)
+print(MontiG_Peak1)
+
+#looking for hump at 575
+MontiG_Peak2 <- MontiG %>% 
+  filter(abs(wavelength - 575) < 5)
+print(MontiG_Peak2)
+#isolate exact peak value for ease 
+MontiG_Peak2 <- MontiG %>% 
+  filter(wavelength == 572.879)          
+print(MontiG_Peak2)
+
+#looking for 600 peak
+MontiG_Peak3 <- MontiG %>% 
+  filter(abs(wavelength - 604) < 5)
+print(MontiG_Peak3)
+#isolate exact peak value for ease 
+MontiG_Peak3 <- MontiG %>% 
+  filter(wavelength == 604.656)
+print(MontiG_Peak3)
+
+#looking for 650 hump
+MontiG_Peak4 <- MontiG %>% 
+  filter(abs(wavelength - 640) < 5)
+print(MontiG_Peak4)
+#isolate exact peak value for ease 
+MontiG_Peak4 <- MontiG %>% 
+  filter(wavelength == 649.746)
+print(MontiG_Peak4)
+
+#looking for chlorophyll dip
+MontiG_Peak5 <- MontiG %>% 
+  filter(abs(wavelength - 667) < 5)
+print(MontiG_Peak5)
+#isolate exact peak value for ease 
+MontiG_Peak5 <- MontiG %>% 
+  filter(wavelength == 662.388)                 
+print(MontiG_Peak5)
+
+#combine all these tables 
+ManualPeak_table <- rbind(MontiG_Peak1, MontiG_Peak2, MontiG_Peak3, MontiG_Peak4, MontiG_Peak5,
+                          MontiB_Peak1, MontiB_Peak2, MontiB_Peak3, MontiB_Peak4,
+                          AcroG_Peak1, AcroG_Peak2, AcroG_Peak3, AcroG_Peak4, AcroG_Peak5,
+                          AcroB_Peak1, AcroB_Peak2, AcroB_Peak3, AcroB_Peak4)
+print(ManualPeak_table)
+
+#exact same values used for HL peak detection
+
+##################################################Stats on peaks
+#Overall paired t-test, pre vs post across all samples
+Reflec_Peak <- read.delim('./CombinedLLHL/SpectroprofilingSTATS_files/Manual_PeakDetection_ResultsREFLEC.txt', sep = "\t")
+Peak_HL <- subset(Reflec_Peak, Condition == "HL")
+Peak_LL <- subset(Reflec_Peak, Condition == "LL")
+
+#Test normality
+#LL Pre
+shapiro_result <- shapiro.test(Peak_LL$Pre_mean_emission)
+print(shapiro_result)
+#significant
+#LL Post
+shapiro_result <- shapiro.test(Peak_LL$Post_mean_emission)
+print(shapiro_result)
+#significant
+
+#HL Pre
+shapiro_result <- shapiro.test(Peak_HL$Pre_mean_emission)
+print(shapiro_result)
+#significant 
+#HL Post
+shapiro_result <- shapiro.test(Peak_HL$Post_mean_emission)
+print(shapiro_result)
+#significant
+
+
+#Test unequal variance
+library(car)
+#LL pre
+leveneTest(Pre_mean_emission ~ Species, data = Peak_LL)
+#not significant
+##LL post
+leveneTest(Post_mean_emission ~ Species, data = Peak_LL)
+#not significant
+
+#HL peak
+leveneTest(Pre_mean_emission ~ Species, data = Peak_HL)
+#not significant
+#HL post
+leveneTest(Post_mean_emission ~ Species, data = Peak_HL)
+#significant
+
+
+#normality wasn't confirmed so use non-parametric alternative
+#LL
+wilcox.test(Peak_LL$Pre_mean_emission, Peak_LL$Post_mean_emission, paired = TRUE)
+#result is significant 
+
+#HL
+wilcox.test(Peak_HL$Pre_mean_emission, Peak_HL$Post_mean_emission, paired = TRUE)
+#result is significant 
+
+
