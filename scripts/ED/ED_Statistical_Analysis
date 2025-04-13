@@ -1,0 +1,201 @@
+#Testing for normality, unequal variance, and pairwise t-test. 
+#Separately for each species between the two treatment groups HL & LL 
+
+#load in library
+library(car)
+
+#load in AcroB ED data
+AcroB <- read.delim('./AcroB_EDLLHL.txt', sep = "\t")
+
+#Begin by checking for normality for ED50s (first subset light conditions)
+AcroB_HL <- subset(AcroB, Condition == "HL")
+AcroB_LL <- subset(AcroB, Condition == "LL")
+
+shapiro_result <- shapiro.test(AcroB_HL$ED50)
+print(shapiro_result)
+shapiro_result <- shapiro.test(AcroB_LL$ED50)
+print(shapiro_result)
+
+#Now test for unequal variance - HLvsLL ED50
+library(car)
+leveneTest(ED50 ~ Condition, data = AcroB)
+
+#Now complete t-test for ED50
+#LL was confirmed non-normal so use Mann-Whitney U test
+wilcox.test(ED50 ~ Condition, data = AcroB, exact = TRUE)
+
+#repeat the process for ED05 and ED95#####################################
+#check normality
+#HL shapiro-wilks for ED05
+shapiro_result <- shapiro.test(AcroB_HL$ED5)
+print(shapiro_result)
+#HL shapiro-wilks for ED95
+shapiro_result <- shapiro.test(AcroB_HL$ED95)
+print(shapiro_result)
+
+#LL
+#LL shapiro-wilks for ED05
+shapiro_result <- shapiro.test(AcroB_LL$ED5)
+print(shapiro_result)
+#LL shapiro-wilks for ED95
+shapiro_result <- shapiro.test(AcroB_LL$ED95)
+print(shapiro_result)
+
+
+#check unequal variance 
+
+#HLvsLL ED5
+leveneTest(ED5 ~ Condition, data = AcroB)
+#HLvsLL ED95
+leveneTest(ED95 ~ Condition, data = AcroB)
+
+#All passed diagnostic tests so can use standard student t-test
+#complete t-test ED5
+t.test(ED5 ~ Condition, data = AcroB, var.equal = TRUE)
+#complete t-test ED95
+t.test(ED95 ~ Condition, data = AcroB, var.equal = TRUE)
+
+
+##############################################################AcroG
+#load in AcroG ED data
+AcroG <- read.delim('./AcroG_EDLLHL.txt', sep = "\t")
+
+#Begin by checking for normality 
+AcroG_HL <- subset(AcroG, Condition == "HL")
+AcroG_LL <- subset(AcroG, Condition == "LL")
+
+shapiro_result <- shapiro.test(AcroG_HL$ED50)
+print(shapiro_result)
+shapiro_result <- shapiro.test(AcroG_LL$ED50)
+print(shapiro_result)
+
+#Now test for unequal variance - HLvsLL ED50
+leveneTest(ED50 ~ Condition, data = AcroG)
+
+#Now complete t-test for ED50
+#LL was confirmed non-normal so use Mann-Whitney U test
+wilcox.test(ED50 ~ Condition, data = AcroG, exact = TRUE)
+
+#repeat the process for ED05 and ED95#####################################
+#check normality
+#HL shapiro-wilks for ED05
+shapiro_result <- shapiro.test(AcroG_HL$ED5)
+print(shapiro_result)
+#HL shapiro-wilks for ED95
+shapiro_result <- shapiro.test(AcroG_HL$ED95)
+print(shapiro_result)
+
+#LL
+#LL shapiro-wilks for ED05
+shapiro_result <- shapiro.test(AcroG_LL$ED5)
+print(shapiro_result)
+#LL shapiro-wilks for ED95
+shapiro_result <- shapiro.test(AcroG_LL$ED95)
+print(shapiro_result)
+
+#check unequal variance 
+#HLvsLL ED5
+leveneTest(ED5 ~ Condition, data = AcroG)
+#HLvsLL ED95
+leveneTest(ED95 ~ Condition, data = AcroG)
+
+#All passed diagnostic tests so can use standard student t-test
+#complete t-test ED5
+t.test(ED5 ~ Condition, data = AcroG, var.equal = TRUE)
+#complete t-test ED95
+t.test(ED95 ~ Condition, data = AcroG, var.equal = TRUE)
+
+#############################################################MontiB
+#load in MontiB ED data
+MontiB <- read.delim('./MontiB_EDLLHL.txt', sep = "\t")
+
+MontiB_HL <- subset(MontiB, Condition == "HL")
+MontiB_LL <- subset(MontiB, Condition == "LL")
+
+#Check normality
+shapiro_result <- shapiro.test(MontiB_HL$ED50)
+print(shapiro_result)
+shapiro_result <- shapiro.test(MontiB_LL$ED50)
+print(shapiro_result)
+
+#check unequal variance 
+leveneTest(ED50 ~ Condition, data = MontiB)
+
+#complete stanard student t-test ED50
+t.test(ED50 ~ Condition, data = MontiB, var.equal = TRUE)
+
+#repeat the process for ED05 and ED95#####################################
+#check for ED05
+shapiro_result <- shapiro.test(MontiB_HL$ED5)
+print(shapiro_result)
+#HL shapiro-wilks for ED95
+shapiro_result <- shapiro.test(MontiB_HL$ED95)
+print(shapiro_result)
+
+#LL
+#LL shapiro-wilks for ED05
+shapiro_result <- shapiro.test(MontiB_LL$ED5)
+print(shapiro_result)
+#shapiro-wilks for ED95
+shapiro_result <- shapiro.test(MontiB_LL$ED95)
+print(shapiro_result)
+
+#HLvsLL ED5
+leveneTest(ED5 ~ Condition, data = MontiB)
+#HLvsLL ED95
+leveneTest(ED95 ~ Condition, data = MontiB)
+
+#can complete standard student t-test
+#complete t-test ED
+t.test(ED5 ~ Condition, data = MontiB, var.equal = TRUE)
+#complete t-test ED95
+t.test(ED95 ~ Condition, data = MontiB, var.equal = TRUE)
+
+###############################################################MontiG
+#load in MontiG ED data
+MontiG <- read.delim('./MontiG_EDLLHL.txt', sep = "\t")
+
+#first separate data 
+MontiG_HL <- subset(MontiG, Condition == "HL")
+MontiG_LL <- subset(MontiG, Condition == "LL")
+
+# HL shapiro-wilks for ED50
+shapiro_result <- shapiro.test(MontiG_HL$ED50)
+print(shapiro_result)
+#LL ED50
+shapiro_result <- shapiro.test(MontiG_LL$ED50)
+print(shapiro_result)
+
+#Now test for unequal variance 
+#HLvsLL ED50
+leveneTest(ED50 ~ Condition, data = MontiG)
+
+#Now complete t-test for ED50
+t.test(ED50 ~ Condition, data = MontiG, var.equal = TRUE)
+
+#repeat the process for ED05 and ED95#####################################
+#check normality
+# > HL shapiro-wilks for ED05
+shapiro_result <- shapiro.test(MontiG_HL$ED5)
+print(shapiro_result)
+# > HL shapiro-wilks for ED95
+shapiro_result <- shapiro.test(MontiG_HL$ED95)
+print(shapiro_result)
+
+# > LL shapiro-wilks for ED05
+shapiro_result <- shapiro.test(MontiG_LL$ED5)
+print(shapiro_result)
+# > LL shapiro-wilks for ED95
+shapiro_result <- shapiro.test(MontiG_LL$ED95)
+print(shapiro_result)
+
+#check unequal variance 
+#HLvsLL ED5
+leveneTest(ED5 ~ Condition, data = MontiG)
+#HLvsLL ED95
+leveneTest(ED95 ~ Condition, data = MontiG)
+
+#complete t-test ED5
+t.test(ED5 ~ Condition, data = MontiG, var.equal = TRUE)
+#complete t-test ED95
+t.test(ED95 ~ Condition, data = MontiG, var.equal = TRUE)
