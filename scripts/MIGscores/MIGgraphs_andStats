@@ -1,0 +1,177 @@
+#All data 
+RELBrightened_BS <- read.delim('./DarkNBright/DarkLLstart_BrightLLHL.txt', sep = "\t")
+#wd > data > combinedLLHL > Photographs > Bleachingscore 
+
+
+#####Seperate HL and LL to two files 
+MontiBboxplotLL <- subset(RELBrightened_BS, Treatment %in% c("LL"))
+MontiBboxplotHL <- subset(RELBrightened_BS, Treatment %in% c("HL"))
+
+MontiBboxplotLL <- subset(MontiBboxplotLL, ID %in% c("MB"))
+MontiBboxplotHL <- subset(MontiBboxplotHL, ID %in% c("MB"))
+
+##########make temp a factor  ################################################################
+MontiBboxplotLL$Temp <- factor(MontiBboxplotLL$Temp, levels = c("28", "34", "37", "40"))
+MontiBboxplotHL$Temp <- factor(MontiBboxplotHL$Temp, levels = c("28", "34", "37", "40"))
+
+
+#box plot MontiB LL#######################################################
+MontiBBoxLL <- ggplot(MontiBboxplotLL, aes(x = Temp, y = Relative, fill = Temp)) +
+  geom_boxplot() +
+  theme_classic() +
+  labs(x = "Temp",
+       y = "MIG") +
+  scale_fill_discrete(labels = c("28C", "34C", "37C", "40C")) +
+  scale_fill_manual(values = c("dodgerblue", "gold", "darkorange", "indianred2"))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  ylim(-15, 75) 
+
+print(MontiBBoxLL)
+
+#box plot MontiB HL#######################################################
+MontiBBoxHL <- ggplot(MontiBboxplotHL, aes(x = Temp, y = Relative, fill = Temp)) +
+  geom_boxplot() +
+  theme_classic() +
+  labs(x = "Temp",
+       y = "MIG") +
+  scale_fill_discrete(labels = c("28C", "34C", "37C", "40C")) +
+  scale_fill_manual(values = c("dodgerblue", "gold", "darkorange", "indianred2"))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  theme_classic()+
+  ylim(-15, 75) 
+
+print(MontiBBoxHL)
+
+#Repeat for each species
+
+########################################################################Now complete STATS
+#All data 
+RELBrightened_BS <- read.delim('./DarkNBright/DarkLLstart_BrightLLHL.txt', sep = "\t")
+#wd > data > combinedLLHL > Photographs > Bleachingscore 
+RELBrightened_BS$Temp <- factor(RELBrightened_BS$Temp)
+
+#subset AcroB, then HL and LL
+AcroB <- subset(RELBrightened_BS, ID == "AB")
+AcroBLL <- subset(AcroB, Treatment == "LL")
+AcroBHL <- subset(AcroB, Treatment == "HL")
+
+#subset AcroG, then HL and LL
+AcroG <- subset(RELBrightened_BS, ID == "AG")
+AcroGLL <- subset(AcroG, Treatment == "LL")
+AcroGHL <- subset(AcroG, Treatment == "HL")
+
+MontiB <- subset(RELBrightened_BS, ID == "MB")
+MontiBLL <- subset(MontiB, Treatment == "LL")
+MontiBHL <- subset(MontiB, Treatment == "HL")
+
+#subset MontiG, then HL and LL
+MontiG <- subset(RELBrightened_BS, ID == "MG")
+MontiGLL <- subset(MontiG, Treatment == "LL")
+MontiGHL <- subset(MontiG, Treatment == "HL")
+
+
+#Check normality
+AcroBResult <- shapiro.test(AcroBLL$Relative)
+print(AcroBResult)
+#Not significant
+AcroBResult2 <- shapiro.test(AcroBHL$Relative)
+print(AcroBResult2)
+#significant (data is non-normal)
+
+#Check normality
+AcroGResult <- shapiro.test(AcroGLL$Relative)
+print(AcroGResult)
+#not significant 
+AcroGResult2 <- shapiro.test(AcroGHL$Relative)
+print(AcroGResult2)
+#not significant 
+
+#Check normality
+MontiBResult <- shapiro.test(MontiBLL$Relative)
+print(MontiBResult)
+#not significant 
+MontiBResult2 <- shapiro.test(MontiBHL$Relative)
+print(MontiBResult2)
+#not significant 
+
+#Check normality
+MontiGResult <- shapiro.test(MontiGLL$Relative)
+print(MontiGResult)
+#significant (data is non-normal)
+MontiGResult2 <- shapiro.test(MontiGHL$Relative)
+print(MontiGResult2)
+#not significant 
+
+library(car)
+leveneTest(Relative ~ Temp, data = AcroBLL)
+leveneTest(Relative ~ Temp, data = AcroBHL)
+
+leveneTest(Relative ~ Temp, data = AcroGLL)
+leveneTest(Relative ~ Temp, data = AcroGHL)
+
+leveneTest(Relative ~ Temp, data = MontiBLL)
+leveneTest(Relative ~ Temp, data = MontiBHL)
+
+leveneTest(Relative ~ Temp, data = MontiGLL)
+leveneTest(Relative ~ Temp, data = MontiGHL)
+#non came back significant 
+
+#ANOVA 
+#was able to use normal AOV
+AcroBLLaov <- aov(Relative~Temp, data=AcroBLL)
+summary(AcroBLLaov)
+#came back significant so perform post-hoc analysis 
+#Tukey to find significant result 
+AcroBLLtukey_result <- TukeyHSD(AcroBLLaov, conf.level = 0.95)
+print(AcroBLLtukey_result)
+
+#data wasn't confirmed normal
+kruskal.test(Relative ~ Temp, data = AcroBHL)
+#result was significant so now complete post hoc test
+library(dunn.test)
+dunn.test(AcroBHL$Relative, AcroBHL$Temp, method = "bonferroni")
+
+#Confirmed normal
+AcroGLLaov <- aov(Relative~Temp, data=AcroGLL)
+summary(AcroGLLaov)
+#came back significant so perform post-hoc analysis 
+#Tukey to find significant result 
+AcroGLLtukey_result <- TukeyHSD(AcroGLLaov, conf.level = 0.95)
+print(AcroGLLtukey_result)
+
+AcroGHLaov <- aov(Relative~Temp, data=AcroGHL)
+summary(AcroGHLaov)
+#came back significant so perform post-hoc analysis 
+#Tukey to find significant result 
+AcroGHLtukey_result <- TukeyHSD(AcroGHLaov, conf.level = 0.95)
+print(AcroGHLtukey_result)
+
+
+#confirmed normal
+MontiBLLaov <- aov(Relative~Temp, data=MontiBLL)
+summary(MontiBLLaov)
+#came back significant so perform post-hoc analysis 
+#Tukey to find significant result 
+MontiBLLtukey_result <- TukeyHSD(MontiBLLaov, conf.level = 0.95)
+print(MontiBLLtukey_result)
+
+MontiBHLaov <- aov(Relative~Temp, data=MontiBHL)
+summary(MontiBHLaov)
+#came back significant so perform post-hoc analysis 
+#Tukey to find significant result 
+MontiBHLtukey_result <- TukeyHSD(MontiBHLaov, conf.level = 0.95)
+print(MontiBHLtukey_result)
+
+
+#confirmed normal
+MontiGHLaov <- aov(Relative~Temp, data=MontiGHL)
+summary(MontiGHLaov)
+#Tukey to find significant result 
+MontiGHLtukey_result <- TukeyHSD(MontiGHLaov, conf.level = 0.95)
+print(MontiGHLtukey_result)
+
+#LL NOT confirmed normal
+kruskal.test(Relative ~ Temp, data = MontiGLL)
+#result was significant so now complete post hoc test
+library(dunn.test)
+dunn.test(MontiGLL$Relative, MontiGLL$Temp, method = "bonferroni")
